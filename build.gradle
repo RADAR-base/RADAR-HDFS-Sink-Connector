@@ -148,9 +148,9 @@ publishing {
             version version
             pom.withXml {
                 def root = asNode()
-                root.appendNode('description', 'Common utilities library containing basic schemas, streaming features, testing bridges and utils.')
-                root.appendNode('name', 'radar-commons')
-                root.appendNode('url', 'https://github.com/RADAR-CNS/RADAR-Commons.git')
+                root.appendNode('description', 'A HDFS Sink connector for RADAR-CNS platform.')
+                root.appendNode('name', 'radar-hdfs-sink-connector')
+                root.appendNode('url', 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git')
                 root.children().last() + pomConfig
             }
         }
@@ -169,7 +169,7 @@ bintray {
         name = 'radar-hdfs-sink-connector'
         userOrg = 'radar-cns'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/RADAR-CNS/RADAR-Commons.git'
+        vcsUrl = 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git'
         version {
             name = version
             desc = 'RADAR-HDFS-Sink-Connector: Initial release'
