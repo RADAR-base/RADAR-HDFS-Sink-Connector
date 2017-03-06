@@ -145,7 +145,7 @@ publishing {
             artifact javadocJar
             groupId 'org.radarcns'
             artifactId 'radar-hdfs-sink-connector'
-            version version
+            version project.version
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'A HDFS Sink connector for RADAR-CNS platform.')
@@ -171,9 +171,9 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git'
         version {
-            name = version
+            name = project.version
             desc = 'RADAR-HDFS-Sink-Connector: Initial release'
-            vcsTag = version
+            vcsTag = System.getenv('TRAVIS_TAG')
         }
     }
 }
