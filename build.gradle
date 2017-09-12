@@ -34,7 +34,9 @@ repositories {
 }
 
 dependencies {
-    provided (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion)
+    provided (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
+        exclude group: 'org.apache.hive', module: 'hive-exec'
+    }
     provided group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
 
     testCompile group: 'junit', name: 'junit', version: junitVersion

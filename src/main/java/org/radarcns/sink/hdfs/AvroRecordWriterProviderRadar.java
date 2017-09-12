@@ -104,11 +104,6 @@ public class AvroRecordWriterProviderRadar implements RecordWriterProvider {
                 if (data == null) {
                     return;
                 }
-                if (data instanceof Struct) {
-                    Schema updatedSchema = ((Struct)data).schema();
-
-
-                }
                 Object outputData = avroData.fromConnectData(schema, data);
                 if (outputData instanceof NonRecordContainer) {
                     outputData = ((NonRecordContainer) outputData).getValue();
