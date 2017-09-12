@@ -11,33 +11,38 @@ import java.util.List;
 import java.util.Map;
 
 public class AvroTopicPartitioner extends FieldPartitioner {
-    private static final String partitionField = "partition";
-    private static final String keySchemaField = "key_schema_id";
-    private static final String valueSchemaField = "value_schema_id";
-    private final List<FieldSchema> partitionFields = new ArrayList<>(3);
+    private static final String PARTITION_FIELD = "partition";
+    private static final String KEY_SCHEMA_FIELD = "key_schema_id";
+    private static final String VALUE_SCHEMA_FIELD = "value_schema_id";
+    private final List<FieldSchema> hiveFields = new ArrayList<>(3);
 
+    @Override
     public void configure(Map<String, Object> config) {
-        this.partitionFields.add(new FieldSchema(partitionField, TypeInfoFactory.stringTypeInfo.toString(), ""));
-        this.partitionFields.add(new FieldSchema(keySchemaField, TypeInfoFactory.stringTypeInfo.toString(), ""));
-        this.partitionFields.add(new FieldSchema(valueSchemaField, TypeInfoFactory.stringTypeInfo.toString(), ""));
+        String stringType = TypeInfoFactory.stringTypeInfo.toString();
+        this.hiveFields.add(new FieldSchema(PARTITION_FIELD, stringType, ""));
+        this.hiveFields.add(new FieldSchema(KEY_SCHEMA_FIELD, stringType, ""));
+        this.hiveFields.add(new FieldSchema(VALUE_SCHEMA_FIELD, stringType, ""));
     }
 
+    @Override
     public String encodePartition(SinkRecord record) {
         final Schema keySchema = record.keySchema();
         String keySchemaId = keySchema.name() + "-" + keySchema.version();
         final Schema valueSchema = record.valueSchema();
         String valueSchemaId = valueSchema.name() + "-" + valueSchema.version();
 
-        return partitionField + "=" + record.kafkaPartition()
-                + "_" + keySchemaField + "=" + keySchemaId
-                + "_" + valueSchemaField + "=" + valueSchemaId;
+        return PARTITION_FIELD + "=" + record.kafkaPartition()
+                + "_" + KEY_SCHEMA_FIELD + "=" + keySchemaId
+                + "_" + VALUE_SCHEMA_FIELD + "=" + valueSchemaId;
     }
 
+    @Override
     public String generatePartitionedPath(String topic, String encodedPartition) {
         return topic + "/" + encodedPartition;
     }
 
+    @Override
     public List<FieldSchema> partitionFields() {
-        return this.partitionFields;
+        return this.hiveFields;
     }
 }
