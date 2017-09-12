@@ -19,7 +19,8 @@ Contains HDFS-Sink-Connector of RADAR-CNS platform
     topics=mock_empatica_e4_battery_level,mock_empatica_e4_blood_volume_pulse
     flush.size=1200
     hdfs.url=hdfs://localhost:9000
-    format.class=org.radarcns.sink.HDFS.AvroFormatRadar
+    format.class=org.radarcns.sink.hdfs.AvroFormatRadar
+    partitioner.class=org.radarcns.sink.hdfs.AvroTopicPartitioner
     ```
    
 4. Run the connector. To run the connector in `standalone mode` (on an enviornment confluent platform is installed)

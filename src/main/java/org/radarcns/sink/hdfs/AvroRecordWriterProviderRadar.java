@@ -35,10 +35,11 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
-import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.kafka.connect.data.Schema;
 
 /**
  * Writes data to HDFS using the Confluent Kafka HDFS connector.
@@ -102,6 +103,11 @@ public class AvroRecordWriterProviderRadar implements RecordWriterProvider {
             private void write(GenericRecord record, int index, Schema schema, Object data) {
                 if (data == null) {
                     return;
+                }
+                if (data instanceof Struct) {
+                    Schema updatedSchema = ((Struct)data).schema();
+
+
                 }
                 Object outputData = avroData.fromConnectData(schema, data);
                 if (outputData instanceof NonRecordContainer) {
