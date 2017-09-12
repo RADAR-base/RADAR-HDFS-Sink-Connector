@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class AvroTopicPartitioner extends FieldPartitioner {
     private static final String PARTITION_FIELD = "partition";
-    private static final String KEY_SCHEMA_FIELD = "key_schema_id";
-    private static final String VALUE_SCHEMA_FIELD = "value_schema_id";
+    private static final String KEY_SCHEMA_FIELD = "key_schema";
+    private static final String VALUE_SCHEMA_FIELD = "value_schema";
     private final List<FieldSchema> hiveFields = new ArrayList<>(3);
 
     @Override
@@ -27,9 +27,19 @@ public class AvroTopicPartitioner extends FieldPartitioner {
     @Override
     public String encodePartition(SinkRecord record) {
         final Schema keySchema = record.keySchema();
-        String keySchemaId = keySchema.name() + "-" + keySchema.version();
+        String keySchemaId;
+        if (keySchema == null) {
+            keySchemaId = "null";
+        } else {
+            keySchemaId = keySchema.name() + "-" + keySchema.version();
+        }
         final Schema valueSchema = record.valueSchema();
-        String valueSchemaId = valueSchema.name() + "-" + valueSchema.version();
+        String valueSchemaId;
+        if (valueSchema == null) {
+            valueSchemaId = "null";
+        } else {
+            valueSchemaId = valueSchema.name() + "-" + valueSchema.version();
+        }
 
         return PARTITION_FIELD + "=" + record.kafkaPartition()
                 + "_" + KEY_SCHEMA_FIELD + "=" + keySchemaId
