@@ -32,4 +32,3 @@ Contains HDFS-Sink-Connector of RADAR-CNS platform
 # Contributing
 Code should be formatted using the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
 If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector/issues), and please make a pull request.
-
