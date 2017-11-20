@@ -82,6 +82,14 @@ pmd {
     ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
+tasks.withType(Pmd) {
+    exclude '**/io/confluent/connect/hdfs/TopicPartitionWriter.java'
+}
+
+tasks.withType(Checkstyle) {
+    exclude '**/io/confluent/connect/hdfs/TopicPartitionWriter.java'
+}
+
 //---------------------------------------------------------------------------//
 // Build system metadata                                                     //
 //---------------------------------------------------------------------------//
