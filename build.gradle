@@ -38,6 +38,7 @@ dependencies {
         exclude group: 'org.apache.hive', module: 'hive-exec'
     }
     provided group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
+    provided group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
 
     testCompile group: 'junit', name: 'junit', version: junitVersion
 
