@@ -84,11 +84,11 @@ pmd {
 }
 
 tasks.withType(Pmd) {
-    exclude '**/io/confluent/connect/hdfs/TopicPartitionWriter.java'
+    exclude '**/io/confluent/**'
 }
 
 tasks.withType(Checkstyle) {
-    exclude '**/io/confluent/connect/hdfs/TopicPartitionWriter.java'
+    exclude '**/io/confluent/**'
 }
 
 //---------------------------------------------------------------------------//
