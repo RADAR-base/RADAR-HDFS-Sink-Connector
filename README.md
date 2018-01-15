@@ -19,7 +19,8 @@ Contains HDFS-Sink-Connector of RADAR-CNS platform
     topics=mock_empatica_e4_battery_level,mock_empatica_e4_blood_volume_pulse
     flush.size=1200
     hdfs.url=hdfs://localhost:9000
-    format.class=org.radarcns.sink.HDFS.AvroFormatRadar
+    format.class=org.radarcns.sink.hdfs.AvroFormatRadar
+    partitioner.class=org.radarcns.sink.hdfs.AvroTopicPartitioner
     ```
    
 4. Run the connector. To run the connector in `standalone mode` (on an enviornment confluent platform is installed)
@@ -31,4 +32,3 @@ Contains HDFS-Sink-Connector of RADAR-CNS platform
 # Contributing
 Code should be formatted using the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
 If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector/issues), and please make a pull request.
-    

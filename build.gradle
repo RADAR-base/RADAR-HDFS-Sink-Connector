@@ -9,18 +9,21 @@ plugins {
     id 'maven-publish'
 }
 
-version '0.1-alpha.1'
+version '0.1'
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
-ext.confluentVersion = '3.1.2'
+ext.confluentVersion = '3.2.1'
+ext.kafkaVersion = '0.10.2.1-cp1'
 ext.junitVersion = '4.12'
 ext.codacyVersion = '1.0.10'
 
 
 configurations {
     codacy
+    provided
+    compile.extendsFrom provided
 }
 
 repositories {
@@ -31,9 +34,12 @@ repositories {
 }
 
 dependencies {
-    compile (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
-        exclude group: 'org.apache.hive'
+    provided (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
+        exclude group: 'org.apache.hive', module: 'hive-exec'
     }
+    provided group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
+    provided group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
+
     testCompile group: 'junit', name: 'junit', version: junitVersion
 
     codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion
@@ -45,7 +51,8 @@ jar {
                 'Implementation-Version': version
     }
     from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        (configurations.compile - configurations.provided).collect { it.isDirectory() ? it : zipTree
+            (it) }
     }
 }
 
@@ -74,6 +81,14 @@ pmd {
 
     ruleSets = []
     ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+tasks.withType(Pmd) {
+    exclude '**/io/confluent/**'
+}
+
+tasks.withType(Checkstyle) {
+    exclude '**/io/confluent/**'
 }
 
 //---------------------------------------------------------------------------//
@@ -180,6 +195,6 @@ bintray {
 
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
-    distributionUrl distributionUrl.replace("bin", "all")
+    gradleVersion = '4.1'
+    distributionType 'all'
 }
