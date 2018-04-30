@@ -4,12 +4,12 @@ It runs the Confluent HDFS Connector 3.2.1 using a custom [RecordWriterProvider]
 
 Create the docker image:
 ```
-$ docker build -t radarcns/radar-hdfs-connector ./
+$ docker build -t radarbase/radar-hdfs-connector ./
 ```
 
 Or pull from dockerhub:
 ```
-$ docker pull radarcns/radar-hdfs-connector:0.1
+$ docker pull radarbase/radar-hdfs-connector:0.1
 ```
 
 ## Configuration
@@ -33,7 +33,7 @@ The docker-compose service could be defined as follows:
 ```yaml
 services:
   radar-hdfs-connector:
-    image: radarcns/radar-hdfs-connector:0.1
+    image: radarbase/radar-hdfs-connector:0.1
     restart: on-failure
     volumes:
       - ./sink-hdfs.properties:/etc/kafka-connect/sink-hdfs.properties
