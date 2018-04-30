@@ -1,7 +1,7 @@
-# RADAR-Connectors
-Contains HDFS-Sink-Connector of RADAR-CNS platform
+# RADAR HDFS Sink connector
+Contains HDFS-Sink-Connector of RADAR-base platform
 
-# To Run Radar-HDFS-Connector
+## Usage
 
 1. In addition to Zookeeper, Kafka-broker(s), Schema-registry and Rest-proxy, HDFS should be running
 2. Load the `radar-hdfs-sink-connector-*.jar` to CLASSPATH
@@ -28,7 +28,11 @@ Contains HDFS-Sink-Connector of RADAR-CNS platform
     ```shell
     connect-standalone /etc/schema-registry/connect-avro-standalone.properties path-to-your-hdfs-connector.properties
     ```
-    
-# Contributing
+
+### Docker usage
+
+To run this connector as a docker container, use the [radarbase/radar-hdfs-connector](https://hub.docker.org/radarbase/radar-hdfs-connector) docker image. See the README in the `docker` directory for more information.
+
+## Contributing
 Code should be formatted using the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
-If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector/issues), and please make a pull request.
+If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-base/RADAR-HDFS-Sink-Connector/issues), and please make a pull request.
