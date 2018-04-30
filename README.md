@@ -1,5 +1,5 @@
 # RADAR HDFS Sink connector
-Contains HDFS-Sink-Connector of RADAR-CNS platform
+Contains HDFS-Sink-Connector of RADAR-base platform
 
 ## Usage
 
@@ -31,8 +31,8 @@ Contains HDFS-Sink-Connector of RADAR-CNS platform
 
 ### Docker usage
 
-To run this connector as a docker container, use the [radarcns/radar-hdfs-connector](https://hub.docker.org/radarcns/radar-hdfs-connector) docker image. See the README in the `docker` directory for more information.
+To run this connector as a docker container, use the [radarbase/radar-hdfs-connector](https://hub.docker.org/radarbase/radar-hdfs-connector) docker image. See the README in the `docker` directory for more information.
 
 ## Contributing
 Code should be formatted using the [Google Java Code Style Guide](https://google.github.io/styleguide/javaguide.html).
-If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector/issues), and please make a pull request.
+If you want to contribute a feature or fix browse our [issues](https://github.com/RADAR-base/RADAR-HDFS-Sink-Connector/issues), and please make a pull request.
