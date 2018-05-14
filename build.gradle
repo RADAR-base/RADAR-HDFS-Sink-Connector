@@ -14,16 +14,14 @@ version '0.1.2-SNAPSHOT'
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
-ext.confluentVersion = '3.2.1'
-ext.kafkaVersion = '0.10.2.1-cp1'
+ext.confluentVersion = '4.1.0'
+ext.kafkaVersion = '1.1.0'
 ext.junitVersion = '4.12'
 ext.codacyVersion = '1.0.10'
 
 
 configurations {
     codacy
-    provided
-    compile.extendsFrom provided
 }
 
 repositories {
@@ -34,11 +32,11 @@ repositories {
 }
 
 dependencies {
-    provided (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
+    compileOnly (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
         exclude group: 'org.apache.hive', module: 'hive-exec'
     }
-    provided group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
-    provided group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
+    compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
+    compileOnly group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
 
     testCompile group: 'junit', name: 'junit', version: junitVersion
 
@@ -195,6 +193,5 @@ bintray {
 
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
-    distributionType 'all'
+    gradleVersion '4.4'
 }
