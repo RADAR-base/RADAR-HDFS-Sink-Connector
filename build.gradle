@@ -15,7 +15,7 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 ext.confluentVersion = '4.1.0'
-ext.kafkaVersion = '1.1.0'
+ext.kafkaVersion = '1.1.0-cp1'
 ext.codacyVersion = '4.0.0'
 ext.guavaVersion = '20.0'
 
@@ -36,18 +36,8 @@ repositories {
 }
 
 dependencies {
-    provided (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
-        // exclude group: 'org.apache.hive', module: 'hive-exec'
-
-        // exclude version 16 since kafka-connect requires at least 20
-        exclude group: 'com.google.guava', module: 'guava'
-    }
+    provided group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
     compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
-
-    //provided group: 'io.confluent', name: 'kafka-connect-storage-common', version: confluentVersion
-
-    // Included version 20 because of this issue - https://github.com/confluentinc/kafka-connect-elasticsearch/issues/143
-    provided group: 'com.google.guava', name: 'guava', version: guavaVersion
 
     compileOnly group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
 
@@ -115,11 +105,6 @@ jacocoTestReport {
         csv.enabled false
         html.enabled false
     }
-}
-
-task copyDependencies(type: Copy) {
-    from configurations.runtimeClasspath.files
-    into "${buildDir}/third-party/"
 }
 
 task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
@@ -202,9 +187,8 @@ bintray {
     }
 }
 
-
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
+    gradleVersion = '4.4'
     distributionType 'all'
 }
 
@@ -213,5 +197,10 @@ if (!hasProperty('profile')) {
 }
 
 apply from: "gradle/profile.${profile}.gradle"
+
+task copyDependencies(type: Copy) {
+    from configurations.runtimeClasspath.files
+    into "${buildDir}/third-party/"
+}
 
 assemble.dependsOn copyDependencies

@@ -26,7 +26,7 @@ COPY ./src/ /code/src
 
 RUN ./gradlew jar
 
-FROM confluentinc/cp-kafka-connect:4.1.0
+FROM confluentinc/cp-kafka-connect-base:4.1.0
 
 MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 
@@ -36,6 +36,10 @@ ENV CONNECT_PLUGIN_PATH /usr/share/java/kafka-connect/plugins
 
 COPY --from=builder /code/build/libs/*.jar /usr/share/java/kafka-connect/plugins/hdfs-sink-connector-radar/
 COPY --from=builder /code/build/third-party/*.jar /usr/share/java/kafka-connect/plugins/hdfs-sink-connector-radar/
+
+# To isolate the classpath from the plugin path as recommended
+COPY --from=builder /code/build/libs/*.jar /etc/kafka-connect/hdfs-sink-connector-radar/
+
 
 # Load topics validator
 COPY ./docker/kafka_status.sh /home/kafka_status.sh

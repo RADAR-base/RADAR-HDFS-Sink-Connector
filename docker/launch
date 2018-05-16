@@ -43,11 +43,10 @@ if [ "$radar_check" -ne 0 ]; then
 fi
 
 echo "===> Launching ${COMPONENT} ... new"
-# Add external jars to the classpath
+# Add our jar to the classpath so that the custom classes can be loaded first.
 # And this also makes sure that the CLASSPATH does not start with ":/etc/..."
-# because this causes the plugin scanner to scan the entire disk.
-export CLASSPATH="/usr/share/java/${COMPONENT}/plugins/hdfs-sink-connector-radar/radar-hdfs-sink-connector-0.1.2-SNAPSHOT.jar"
-#echo $CLASSPATH
+# other jars are loaded via the plugin path
+export CLASSPATH="/etc/${COMPONENT}/hdfs-sink-connector-radar/*"
 
 # execute connector in standalone mode
 exec connect-standalone /etc/"${COMPONENT}"/"${COMPONENT}".properties $(find /etc/"${COMPONENT}"/ -type f -name "${CONNECTOR_PROPERTY_FILE_PREFIX}*.properties")

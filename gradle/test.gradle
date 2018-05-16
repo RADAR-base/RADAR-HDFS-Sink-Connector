@@ -3,5 +3,4 @@ ext.junitVersion = '4.12'
 dependencies {
     testCompile group: 'junit', name: 'junit', version: junitVersion
     testImplementation group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
-    testImplementation group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
 }
