@@ -100,8 +100,8 @@ public class AvroRecordWriterProviderRadar implements
 
                     try {
                         logger.info("Opening record writer for: {}", s);
-                        final FSDataOutputStream out = path.getFileSystem(hdfsSinkConnectorConfig
-                                .getHadoopConfiguration()).create(path);
+                        final FSDataOutputStream out = path.getFileSystem(hdfsSinkConnectorConfig.
+                                getHadoopConfiguration()).create(path);
                         this.writer.create(combinedSchema, out);
                     } catch (IOException exc) {
                         throw new ConnectException(exc);
