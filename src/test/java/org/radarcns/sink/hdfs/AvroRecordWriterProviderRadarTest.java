@@ -34,7 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class AvroRecordWriterProviderRadarTest {
-    private AvroData avroData;
     private AvroRecordWriterProviderRadar provider;
     private HdfsSinkConnectorConfig conf;
     private String outputFile;
@@ -45,7 +44,7 @@ public class AvroRecordWriterProviderRadarTest {
         Map<String, String> props = new HashMap<>();
         props.put(HdfsSinkConnectorConfig.FLUSH_SIZE_CONFIG,"15000");
         conf = new HdfsSinkConnectorConfig(props);
-        avroData = new AvroData(100);
+        AvroData avroData = new AvroData(100);
         provider = new AvroRecordWriterProviderRadar(avroData);
     }
 
