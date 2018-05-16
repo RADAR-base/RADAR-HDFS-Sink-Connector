@@ -16,7 +16,6 @@
 package io.confluent.kafka.serializers;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericContainer;
@@ -31,7 +30,6 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.codehaus.jackson.node.JsonNodeFactory;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -235,7 +233,7 @@ public abstract class AbstractKafkaAvroDeserializer extends AbstractKafkaAvroSer
             }
         } catch (IOException | RuntimeException e) {
             // avro deserialization may throw AvroRuntimeException, NullPointerException, etc
-            throw new SerializationException("Error deserializing Avro message for id " + id , e);
+            throw new SerializationException("Error deserializing Avro message for id " + id, e);
         } catch (RestClientException e) {
             throw new SerializationException("Error retrieving Avro schema for id " + id, e);
         }

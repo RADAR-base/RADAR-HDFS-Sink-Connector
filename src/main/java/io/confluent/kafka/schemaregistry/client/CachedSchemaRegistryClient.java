@@ -15,11 +15,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.confluent.kafka.serializers.AbstractKafkaAvroDeserializer;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Parser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CachedSchemaRegistryClient implements SchemaRegistryClient {
     private final RestService restService;
