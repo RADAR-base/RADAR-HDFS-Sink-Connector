@@ -14,22 +14,28 @@ FROM openjdk:8-alpine as builder
 
 RUN mkdir /code
 WORKDIR /code
+
+ENV GRADLE_OPTS -Dorg.gradle.daemon=false -Dorg.gradle.project.profile=docker
+
 COPY ./gradle/ /code/gradle
 COPY ./build.gradle ./gradle.properties ./gradlew ./settings.gradle /code/
 
-RUN ./gradlew --no-daemon downloadDependencies
+RUN ./gradlew downloadDependencies copyDependencies
 
 COPY ./src/ /code/src
 
-RUN ./gradlew --no-daemon jar
+RUN ./gradlew jar
 
-FROM confluentinc/cp-kafka-connect:3.2.1
+FROM confluentinc/cp-kafka-connect:4.1.0
 
-MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl>
+MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 
 LABEL description="RADAR-CNS Backend- HDFS Sink Connector"
 
-COPY --from=builder /code/build/libs/*.jar /etc/kafka-connect/jars/
+ENV CONNECT_PLUGIN_PATH /usr/share/java/kafka-connect/plugins
+
+COPY --from=builder /code/build/libs/*.jar /usr/share/java/kafka-connect/plugins/hdfs-sink-connector-radar/
+COPY --from=builder /code/build/third-party/*.jar /usr/share/java/kafka-connect/plugins/hdfs-sink-connector-radar/
 
 # Load topics validator
 COPY ./docker/kafka_status.sh /home/kafka_status.sh

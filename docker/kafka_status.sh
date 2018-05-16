@@ -18,9 +18,9 @@ max_timeout=32
 tries=10
 timeout=1
 while true; do
-    ZOOKEEPER_CHECK=$(zookeeper-shell $KAFKA_ZOOKEEPER_CONNECT <<< "ls /brokers/ids")
+    ZOOKEEPER_CHECK=$(zookeeper-shell $CONNECT_ZOOKEEPER_CONNECT <<< "ls /brokers/ids" | tail -2 | head -1)
     echo "Zookeeper response: ${ZOOKEEPER_CHECK}"
-    ZOOKEEPER_CHECK="${ZOOKEEPER_CHECK##*$'\n'}"
+    # ZOOKEEPER_CHECK="${ZOOKEEPER_CHECK##*$'\n'}"
     ZOOKEEPER_CHECK="$(echo -e "${ZOOKEEPER_CHECK}" | tr -d '[:space:]'  | tr -d '['  | tr -d ']')"
 
     IFS=',' read -r -a array <<< $ZOOKEEPER_CHECK
@@ -45,7 +45,7 @@ done
 tries=10
 timeout=1
 while true; do
-    if wget -sq "${CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL}/subjects" 2>/dev/null; then
+    if wget --spider -q "${CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL}/subjects" 2>/dev/null; then
         break
     fi
     tries=$((tries - 1))

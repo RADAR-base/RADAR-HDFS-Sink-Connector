@@ -14,20 +14,22 @@ version '0.1.2-SNAPSHOT'
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
-ext.confluentVersion = '3.2.1'
-ext.kafkaVersion = '0.10.2.1-cp1'
-ext.junitVersion = '4.12'
-ext.codacyVersion = '1.0.10'
+ext.confluentVersion = '4.1.0'
+ext.kafkaVersion = '1.1.0'
+ext.codacyVersion = '4.0.0'
+ext.guavaVersion = '20.0'
 
 
 configurations {
     codacy
     provided
+    api
     compile.extendsFrom provided
 }
 
 repositories {
     jcenter()
+    maven { url 'http://repo.spring.io/plugins-release/' }
     maven { url 'http://packages.confluent.io/maven/' }
     maven { url 'https://jitpack.io' }
     maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
@@ -35,12 +37,19 @@ repositories {
 
 dependencies {
     provided (group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion) {
-        exclude group: 'org.apache.hive', module: 'hive-exec'
-    }
-    provided group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
-    provided group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
+        // exclude group: 'org.apache.hive', module: 'hive-exec'
 
-    testCompile group: 'junit', name: 'junit', version: junitVersion
+        // exclude version 16 since kafka-connect requires at least 20
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
+
+    //provided group: 'io.confluent', name: 'kafka-connect-storage-common', version: confluentVersion
+
+    // Included version 20 because of this issue - https://github.com/confluentinc/kafka-connect-elasticsearch/issues/143
+    provided group: 'com.google.guava', name: 'guava', version: guavaVersion
+
+    compileOnly group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
 
     codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion
 }
@@ -108,9 +117,9 @@ jacocoTestReport {
     }
 }
 
-task downloadDependencies(type: Exec) {
-    configurations.codacy.files
-    commandLine 'echo', 'Downloaded all dependencies'
+task copyDependencies(type: Copy) {
+    from configurations.runtimeClasspath.files
+    into "${buildDir}/third-party/"
 }
 
 task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
@@ -198,3 +207,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.1'
     distributionType 'all'
 }
+
+if (!hasProperty('profile')) {
+    ext.profile = 'dev'
+}
+
+apply from: "gradle/profile.${profile}.gradle"
+
+assemble.dependsOn copyDependencies

@@ -60,6 +60,8 @@
   </rule>
 
   <rule ref="rulesets/java/codesize.xml">
+    <exclude name="StdCyclomaticComplexity"/>
+    <exclude name="ModifiedCyclomaticComplexity"/>
     <exclude name="CyclomaticComplexity"/>
     <exclude name="ExcessiveClassLength"/>
     <exclude name="ExcessivePublicCount"/>
