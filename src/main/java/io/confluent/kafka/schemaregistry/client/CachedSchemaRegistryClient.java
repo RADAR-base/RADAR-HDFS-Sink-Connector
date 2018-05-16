@@ -63,7 +63,8 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
         if (configs != null) {
             String credentialSourceConfig = (String)configs.get("basic.auth.credentials.source");
             if (credentialSourceConfig != null && !credentialSourceConfig.isEmpty()) {
-                BasicAuthCredentialProvider basicAuthCredentialProvider = BasicAuthCredentialProviderFactory.
+                BasicAuthCredentialProvider basicAuthCredentialProvider
+                        = BasicAuthCredentialProviderFactory.
                         getBasicAuthCredentialProvider(BasicAuthCredentialSource.
                                 valueOf(credentialSourceConfig), configs);
                 this.restService.setBasicAuthCredentialProvider(basicAuthCredentialProvider);
@@ -109,8 +110,8 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
         if (((Map)schemaIdMap).containsKey(schema)) {
             return (Integer)((Map)schemaIdMap).get(schema);
         } else if (((Map)schemaIdMap).size() >= this.identityMapCapacity) {
-            throw new IllegalStateException("Too many schema objects created for " + subject +
-                    "!");
+            throw new IllegalStateException("Too many schema objects created for " + subject
+                    + "!");
         } else {
             int id = this.registerAndGetId(subject, schema);
             ((Map)schemaIdMap).put(schema, id);
@@ -154,7 +155,8 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
 
     public SchemaMetadata getSchemaMetadata(String subject, int version) throws IOException,
             RestClientException {
-        io.confluent.kafka.schemaregistry.client.rest.entities.Schema response = this.restService.getVersion(subject, version);
+        io.confluent.kafka.schemaregistry.client.rest.entities.Schema response = this.restService.
+                getVersion(subject, version);
         int id = response.getId();
         String schema = response.getSchema();
         return new SchemaMetadata(id, version, schema);
@@ -183,8 +185,8 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
         if (((Map)schemaVersionMap).containsKey(schema)) {
             return (Integer)((Map)schemaVersionMap).get(schema);
         } else if (((Map)schemaVersionMap).size() >= this.identityMapCapacity) {
-            throw new IllegalStateException("Too many schema objects created for " + subject +
-                    "!");
+            throw new IllegalStateException("Too many schema objects created for " + subject
+                    + "!");
         } else {
             int version = this.getVersionFromRegistry(subject, schema);
             ((Map)schemaVersionMap).put(schema, version);
@@ -201,13 +203,13 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
             this.versionCache.put(subject, (Map)schemaVersionMap);
         }
 
-        if (((Map)schemaVersionMap).containsKey(schema) &&
-                (int)((Map)schemaVersionMap).get(schema) == version) {
+        if (((Map)schemaVersionMap).containsKey(schema)
+                && (int)((Map)schemaVersionMap).get(schema) == version) {
             //same version already exists, do nothing
             return;
         } else if (((Map)schemaVersionMap).size() >= this.identityMapCapacity) {
-            throw new IllegalStateException("Too many schema objects created for " + subject +
-                    "!");
+            throw new IllegalStateException("Too many schema objects created for " + subject
+                    + "!");
         } else {
             ((Map)schemaVersionMap).put(schema, version);
         }
@@ -244,8 +246,8 @@ public class CachedSchemaRegistryClient implements SchemaRegistryClient {
         if (((Map)schemaIdMap).containsKey(schema)) {
             return (Integer)((Map)schemaIdMap).get(schema);
         } else if (((Map)schemaIdMap).size() >= this.identityMapCapacity) {
-            throw new IllegalStateException("Too many schema objects created for " + subject +
-                    "!");
+            throw new IllegalStateException("Too many schema objects created for " + subject
+                    + "!");
         } else {
             int id = this.getIdFromRegistry(subject, schema);
             ((Map)schemaIdMap).put(schema, id);

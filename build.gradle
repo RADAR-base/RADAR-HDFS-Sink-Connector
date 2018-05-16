@@ -59,7 +59,7 @@ jar {
 
 checkstyle {
     // codacy version
-    toolVersion '6.16'
+    toolVersion '8.10'
     ignoreFailures false
 
     // ignore tests
