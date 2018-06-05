@@ -16,8 +16,6 @@ ext.codacyVersion = '4.0.0'
 
 configurations {
     codacy
-    provided
-    compile.extendsFrom provided
 }
 
 repositories {
@@ -29,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    provided group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
+    api group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
     compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
 
     compileOnly group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
@@ -41,10 +39,6 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'RADAR-CNS HDFS Connector',
                 'Implementation-Version': version
-    }
-    from {
-        (configurations.compile - configurations.provided).collect { it.isDirectory() ? it : zipTree
-            (it) }
     }
 }
 
