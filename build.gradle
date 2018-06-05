@@ -1,12 +1,7 @@
 plugins {
     // Apply the java plugin to add support for Java
-    id 'java'
-    id 'idea'
-    id 'jacoco'
-    id 'checkstyle'
-    id 'pmd'
-    id "com.jfrog.bintray" version "1.7.3"
-    id 'maven-publish'
+    id 'java-library'
+    id 'com.jfrog.bintray' version '1.8.0' apply false
 }
 
 version '0.1.2-SNAPSHOT'
@@ -53,141 +48,8 @@ jar {
     }
 }
 
-//---------------------------------------------------------------------------//
-// Style checking                                                            //
-//---------------------------------------------------------------------------//
-
-checkstyle {
-    // codacy version
-    toolVersion '8.10'
-    ignoreFailures false
-
-    // ignore tests
-    sourceSets = [sourceSets.main]
-}
-
-pmd {
-    // codacy version
-    toolVersion = '5.5.2'
-    ignoreFailures = false
-
-    // ignore tests
-    sourceSets = [sourceSets.main]
-
-    consoleOutput = true
-
-    ruleSets = []
-    ruleSetFiles = files("config/pmd/ruleset.xml")
-}
-
-tasks.withType(Pmd) {
-    exclude '**/io/confluent/**'
-}
-
-tasks.withType(Checkstyle) {
-    exclude '**/io/confluent/**'
-}
-
-//---------------------------------------------------------------------------//
-// Build system metadata                                                     //
-//---------------------------------------------------------------------------//
-idea {
-    module {
-        downloadSources = true
-    }
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled false
-    }
-}
-
-task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
-    main = 'com.codacy.CodacyCoverageReporter'
-    classpath = configurations.codacy
-    args = ['-l', 'Java', '-r', "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"]
-}
-
-def pomConfig = {
-    licenses {
-        license {
-            name "The Apache Software License, Version 2.0"
-            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            distribution "pre-release"
-        }
-    }
-    developers {
-        developer {
-            id "radar-cns"
-            name "Nivethika"
-            email "nivethika@thehyve.nl"
-        }
-    }
-}
-// custom tasks for creating source/javadoc jars
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.output
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-// add javadoc/source jar tasks as artifacts
-artifacts {
-    archives sourcesJar, javadocJar
-}
-
-
-publishing {
-    publications {
-        RadarPublication(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact javadocJar
-            groupId 'org.radarcns'
-            artifactId 'radar-hdfs-sink-connector'
-            version project.version
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', 'A HDFS Sink connector for RADAR-CNS platform.')
-                root.appendNode('name', 'radar-hdfs-sink-connector')
-                root.appendNode('url', 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git')
-                root.children().last() + pomConfig
-            }
-        }
-    }
-}
-
-
-
-bintray {
-    user = System.getenv('BINTRAY_USER')? System.getenv('BINTRAY_USER') : project.property('bintrayUser')
-    key = System.getenv('BINTRAY_API_KEY') ? System.getenv('BINTRAY_API_KEY') : project.property('bintrayApiKey')
-    override = false
-    publications = ['RadarPublication']
-    pkg {
-        repo = 'org.radarcns'
-        name = 'radar-hdfs-sink-connector'
-        userOrg = 'radar-cns'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git'
-        version {
-            name = project.version
-            desc = 'RADAR-HDFS-Sink-Connector: Initial release'
-            vcsTag = System.getenv('TRAVIS_TAG')
-        }
-    }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.4'
-    distributionType 'all'
+wrapper {
+    gradleVersion '4.4'
 }
 
 if (!hasProperty('profile')) {
@@ -195,10 +57,3 @@ if (!hasProperty('profile')) {
 }
 
 apply from: "gradle/profile.${profile}.gradle"
-
-task copyDependencies(type: Copy) {
-    from configurations.runtimeClasspath.files
-    into "${buildDir}/third-party/"
-}
-
-assemble.dependsOn copyDependencies

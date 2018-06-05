@@ -5,3 +5,10 @@ task downloadDependencies {
         println 'Downloaded code dependencies'
     }
 }
+
+task copyDependencies(type: Copy) {
+    from configurations.runtimeClasspath.files
+    into "${buildDir}/third-party/"
+}
+
+assemble.dependsOn copyDependencies
