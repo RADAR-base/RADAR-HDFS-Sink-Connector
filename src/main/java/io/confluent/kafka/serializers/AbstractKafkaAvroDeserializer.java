@@ -16,7 +16,6 @@
 
 package io.confluent.kafka.serializers;
 
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericContainer;
@@ -33,6 +32,7 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,7 +46,8 @@ public abstract class AbstractKafkaAvroDeserializer extends AbstractKafkaAvroSer
   public static final String SCHEMA_REGISTRY_SCHEMA_VERSION_PROP =
       "schema.registry.schema.version";
 
-  private final Map<String, Map<Integer, Integer>> oldToNewIdMap = new HashMap<>();
+  private final Map<String, Map<Integer, Integer>> oldToNewIdMap = new IdentityHashMap<>();
+  private final Map<String, Map<Schema, Integer>> oldToNewVersionMap = new IdentityHashMap<>();
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractKafkaAvroDeserializer.class);
 
@@ -130,11 +131,12 @@ public abstract class AbstractKafkaAvroDeserializer extends AbstractKafkaAvroSer
       String subject = includeSchemaAndVersion ? getSubjectName(topic, isKey, null) : null;
       Schema schema;
       SchemaMetadata schemaMetadata = null;
+      Map<Integer, Integer> subjectIdMap = oldToNewIdMap.get(subject);
       try {
-        if (oldToNewIdMap.containsKey(subject)) {
-          if (((Map) oldToNewIdMap.get(subject)).containsKey(id)) {
-            // use new id of the schema instead of a stale old one
-            id = (int) ((Map) oldToNewIdMap.get(subject)).get(id);
+        if (subjectIdMap != null) {
+          Integer newId = subjectIdMap.get(id);
+          if (newId != null) {
+            id = newId;
           }
         }
         schema = getBySubjectAndId(subject, id);
@@ -146,11 +148,12 @@ public abstract class AbstractKafkaAvroDeserializer extends AbstractKafkaAvroSer
           id = schemaMetadata.getId();
           schema = new Schema.Parser().parse(schemaMetadata.getSchema());
 
-          if (! oldToNewIdMap.containsKey(subject)) {
-            oldToNewIdMap.put(subject, new HashMap<>());
+          if (subjectIdMap == null) {
+            subjectIdMap = new HashMap<>();
+            oldToNewIdMap.put(subject, subjectIdMap);
           }
           // keep a track of a subject's ids map so that subsequent records don't query the wrong schema id
-          ((Map)oldToNewIdMap.get(subject)).put(oldId, id);
+          subjectIdMap.put(oldId, id);
 
           logger.debug("success -> schemaMetadata.getId({}) for subject {}", id, subject);
 
@@ -187,23 +190,30 @@ public abstract class AbstractKafkaAvroDeserializer extends AbstractKafkaAvroSer
         // Converter to let a version provided by a Kafka Connect source take priority over the
         // schema registry's ordering (which is implicit by auto-registration time rather than
         // explicit from the Connector).
-        Integer version;
+        Integer version = null;
         if (schemaMetadata != null) {
           version = schemaMetadata.getVersion();
         } else {
+          Map<Schema, Integer> schemaVersionMap = oldToNewVersionMap.get(subject);
+          if (schemaVersionMap != null) {
+            version = schemaVersionMap.get(schema);
+          }
           try {
-            version = schemaRegistry.getVersion(subject, schema);
+            if (version == null) {
+              version = schemaRegistry.getVersion(subject, schema);
+            }
           } catch (RestClientException e) {
             if (e.getErrorCode() == 40403) {
               logger.debug("Trying to get version from Latest SchemaMetadata from schemaRegistry for subject {}", subject);
               schemaMetadata = schemaRegistry.getLatestSchemaMetadata(subject);
               version = schemaMetadata.getVersion();
 
-              // Need to add version to cache otherwise will be requested from schema registry with each record
-              if(schemaRegistry instanceof CachedSchemaRegistryClient) {
-                logger.debug("Putting version {} for subject {} in cache", id, subject);
-                ((CachedSchemaRegistryClient) schemaRegistry).putVersion(subject, schema, version);
+              if (schemaVersionMap == null) {
+                schemaVersionMap = new IdentityHashMap<>();
+                oldToNewVersionMap.put(subject, schemaVersionMap);
               }
+
+              schemaVersionMap.put(schema, version);
               logger.debug("success -> schemaMetadata.getVersion({}) for subject {}", version, subject);
             } else {
               throw e;
