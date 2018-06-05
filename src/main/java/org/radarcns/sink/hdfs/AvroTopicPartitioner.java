@@ -21,8 +21,10 @@ public class AvroTopicPartitioner extends FieldPartitioner<FieldSchema>
     @Override
     public void configure(Map<String, Object> config) {
         String stringType = TypeInfoFactory.stringTypeInfo.toString();
-        this.hiveFields.add(new FieldSchema(
-                PARTITION_FIELD, stringType, ""));
+        if (!this.hiveFields.isEmpty()) {
+            this.hiveFields.clear();
+        }
+        this.hiveFields.add(new FieldSchema(PARTITION_FIELD, stringType, ""));
         this.hiveFields.add(new FieldSchema(KEY_SCHEMA_FIELD, stringType, ""));
         this.hiveFields.add(new FieldSchema(VALUE_SCHEMA_FIELD, stringType, ""));
     }

@@ -91,12 +91,12 @@ public class AvroRecordWriterProviderRadar implements
                             record(getSchemaName(keySchema) + "_" + getSchemaName(valueSchema)).
                             namespace("org.radarcns.combined").doc("combined key-value record");
 
-                    this.combinedSchema = builder.fields().
-                            name("key").doc("Key of a Kafka SinkRecord").
-                            type(getSchema(avroData, keySchema)).noDefault().
-                            name("value").doc("Value of a Kafka SinkRecord").
-                            type(getSchema(avroData, valueSchema)).noDefault().
-                            endRecord();
+                    this.combinedSchema = builder.fields()
+                            .name("key").doc("Key of a Kafka SinkRecord")
+                            .type(getSchema(avroData, keySchema)).noDefault()
+                            .name("value").doc("Value of a Kafka SinkRecord")
+                            .type(getSchema(avroData, valueSchema)).noDefault()
+                            .endRecord();
 
                     try {
                         logger.info("Opening record writer for: {}", s);
