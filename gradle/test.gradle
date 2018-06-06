@@ -1,0 +1,6 @@
+ext.junitVersion = '4.12'
+
+dependencies {
+    testImplementation group: 'junit', name: 'junit', version: junitVersion
+    testImplementation group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
+}

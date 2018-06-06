@@ -14,25 +14,38 @@ FROM openjdk:8-alpine as builder
 
 RUN mkdir /code
 WORKDIR /code
-COPY ./gradle/ /code/gradle
-COPY ./build.gradle ./gradle.properties ./gradlew ./settings.gradle /code/
 
-RUN ./gradlew --no-daemon downloadDependencies
+ENV GRADLE_OPTS -Dorg.gradle.daemon=false -Dorg.gradle.project.profile=docker
+
+COPY ./gradle/wrapper /code/gradle/wrapper
+COPY ./gradlew /code/
+RUN ./gradlew --version
+
+COPY ./gradle/profile.docker.gradle /code/gradle/
+COPY ./build.gradle ./gradle.properties ./settings.gradle /code/
+
+RUN ./gradlew downloadDependencies copyDependencies
 
 COPY ./src/ /code/src
 
-RUN ./gradlew --no-daemon jar
+RUN ./gradlew jar
 
-FROM confluentinc/cp-kafka-connect:3.2.1
+FROM confluentinc/cp-kafka-connect-base:4.1.0
 
-MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl>
+MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 
 LABEL description="RADAR-CNS Backend- HDFS Sink Connector"
 
-COPY --from=builder /code/build/libs/*.jar /etc/kafka-connect/jars/
+ENV CONNECT_PLUGIN_PATH /usr/share/java/kafka-connect/plugins
+
+COPY --from=builder /code/build/third-party/*.jar ${CONNECT_PLUGIN_PATH}/radar-hdfs-sink-connector/
+COPY --from=builder /code/build/libs/*.jar ${CONNECT_PLUGIN_PATH}/radar-hdfs-sink-connector/
+
+# To isolate the classpath from the plugin path as recommended
+COPY --from=builder /code/build/libs/*.jar /etc/kafka-connect/radar-hdfs-sink-connector/
 
 # Load topics validator
-COPY ./docker/kafka_status.sh /home/kafka_status.sh
+COPY ./src/main/docker/kafka-wait /usr/bin/kafka-wait
 
 # Load modified launcher
-COPY ./docker/launch /etc/confluent/docker/launch
+COPY ./src/main/docker/launch /etc/confluent/docker/launch

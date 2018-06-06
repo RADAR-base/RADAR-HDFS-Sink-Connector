@@ -36,18 +36,17 @@ fi
 
 # Busy waiting loop that waits untill all topic are available
 echo "===> Wait for infrastructure ..."
-./home/kafka_status.sh
+kafka-wait
 radar_check=$?
 if [ "$radar_check" -ne 0 ]; then
     exit $radar_check
 fi
 
-echo "===> Launching ${COMPONENT} ... new"
-# Add external jars to the classpath
+echo "===> Launching ${COMPONENT} ..."
+# Add our jar to the classpath so that the custom classes can be loaded first.
 # And this also makes sure that the CLASSPATH does not start with ":/etc/..."
-# because this causes the plugin scanner to scan the entire disk.
-export CLASSPATH="/etc/${COMPONENT}/jars/*"
-echo $CLASSPATH
+# other jars are loaded via the plugin path
+export CLASSPATH="/etc/${COMPONENT}/radar-hdfs-sink-connector/*"
 
 # execute connector in standalone mode
 exec connect-standalone /etc/"${COMPONENT}"/"${COMPONENT}".properties $(find /etc/"${COMPONENT}"/ -type f -name "${CONNECTOR_PROPERTY_FILE_PREFIX}*.properties")
