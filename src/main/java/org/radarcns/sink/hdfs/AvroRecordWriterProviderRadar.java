@@ -104,11 +104,11 @@ public class AvroRecordWriterProviderRadar implements
     }
 
     private class MyRecordWriter implements RecordWriter {
-        final DataFileWriter<Object> writer;
-        final Path path;
+        private final DataFileWriter<Object> writer;
+        private final Path path;
         private final String s;
         private final HdfsSinkConnectorConfig hdfsSinkConnectorConfig;
-        org.apache.avro.Schema combinedSchema;
+        private org.apache.avro.Schema combinedSchema;
 
         private MyRecordWriter(String s, HdfsSinkConnectorConfig hdfsSinkConnectorConfig) {
             this.s = s;
