@@ -77,75 +77,7 @@ public class AvroRecordWriterProviderRadar implements
     @Override
     public RecordWriter getRecordWriter(final HdfsSinkConnectorConfig hdfsSinkConnectorConfig,
                                         String s) {
-        return new RecordWriter() {
-            final DataFileWriter<Object> writer = new DataFileWriter<>(new GenericDatumWriter<>());
-            final Path path = new Path(s);
-            org.apache.avro.Schema combinedSchema = null;
-
-            @Override
-            public void write(SinkRecord record) {
-                final Schema keySchema = record.keySchema();
-                final Schema valueSchema = record.valueSchema();
-                if (this.combinedSchema == null) {
-                    SchemaBuilder.RecordBuilder<org.apache.avro.Schema> builder = SchemaBuilder.
-                            record(getSchemaName(keySchema) + "_" + getSchemaName(valueSchema)).
-                            namespace("org.radarcns.combined").doc("combined key-value record");
-
-                    this.combinedSchema = builder.fields()
-                            .name("key").doc("Key of a Kafka SinkRecord")
-                            .type(getSchema(avroData, keySchema)).noDefault()
-                            .name("value").doc("Value of a Kafka SinkRecord")
-                            .type(getSchema(avroData, valueSchema)).noDefault()
-                            .endRecord();
-
-                    try {
-                        logger.info("Opening record writer for: {}", s);
-                        final FSDataOutputStream out = path.getFileSystem(hdfsSinkConnectorConfig.
-                                getHadoopConfiguration()).create(path);
-                        this.writer.create(combinedSchema, out);
-                    } catch (IOException exc) {
-                        throw new ConnectException(exc);
-                    }
-                }
-
-                logger.trace("Sink record: {}", record.toString());
-
-                GenericRecord combinedRecord = new GenericData.Record(combinedSchema);
-                write(combinedRecord, 0, keySchema, record.key());
-                write(combinedRecord, 1, valueSchema, record.value());
-                try {
-                    this.writer.append(combinedRecord);
-                } catch (IOException exc) {
-                    throw new DataException(exc);
-                }
-            }
-
-            private void write(GenericRecord record, int index, Schema schema, Object data) {
-                if (data == null) {
-                    return;
-                }
-                Object outputData = avroData.fromConnectData(schema, data);
-                if (outputData instanceof NonRecordContainer) {
-                    outputData = ((NonRecordContainer) outputData).getValue();
-                }
-                record.put(index, outputData);
-            }
-
-            @Override
-            public void close() {
-                try {
-                    writer.close();
-                } catch (IOException exc) {
-                    throw new DataException(exc);
-                }
-
-            }
-
-            @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
-            @Override
-            public void commit() {
-            }
-        };
+        return new MyRecordWriter(s, hdfsSinkConnectorConfig);
     }
 
 
@@ -168,6 +100,86 @@ public class AvroRecordWriterProviderRadar implements
                     Arrays.asList(org.apache.avro.Schema.create(NULL), ANYTHING_SCHEMA));
         } else {
             return avroData.fromConnectSchema(schema);
+        }
+    }
+
+    private class MyRecordWriter implements RecordWriter {
+        final DataFileWriter<Object> writer;
+        final Path path;
+        private final String s;
+        private final HdfsSinkConnectorConfig hdfsSinkConnectorConfig;
+        org.apache.avro.Schema combinedSchema;
+
+        private MyRecordWriter(String s, HdfsSinkConnectorConfig hdfsSinkConnectorConfig) {
+            this.s = s;
+            this.hdfsSinkConnectorConfig = hdfsSinkConnectorConfig;
+            writer = new DataFileWriter<>(new GenericDatumWriter<>());
+            path = new Path(s);
+            combinedSchema = null;
+        }
+
+        @Override
+        public void write(SinkRecord record) {
+            final Schema keySchema = record.keySchema();
+            final Schema valueSchema = record.valueSchema();
+            if (this.combinedSchema == null) {
+                SchemaBuilder.RecordBuilder<org.apache.avro.Schema> builder = SchemaBuilder.
+                        record(getSchemaName(keySchema) + "_" + getSchemaName(valueSchema)).
+                        namespace("org.radarcns.combined").doc("combined key-value record");
+
+                this.combinedSchema = builder.fields()
+                        .name("key").doc("Key of a Kafka SinkRecord")
+                        .type(getSchema(avroData, keySchema)).noDefault()
+                        .name("value").doc("Value of a Kafka SinkRecord")
+                        .type(getSchema(avroData, valueSchema)).noDefault()
+                        .endRecord();
+
+                try {
+                    logger.info("Opening record writer for: {}", s);
+                    final FSDataOutputStream out = path.getFileSystem(hdfsSinkConnectorConfig.
+                            getHadoopConfiguration()).create(path);
+                    this.writer.create(combinedSchema, out);
+                } catch (IOException exc) {
+                    throw new ConnectException(exc);
+                }
+            }
+
+            logger.trace("Sink record: {}", record.toString());
+
+            GenericRecord combinedRecord = new GenericData.Record(combinedSchema);
+            write(combinedRecord, 0, keySchema, record.key());
+            write(combinedRecord, 1, valueSchema, record.value());
+            try {
+                this.writer.append(combinedRecord);
+            } catch (IOException exc) {
+                throw new DataException(exc);
+            }
+        }
+
+        private void write(GenericRecord record, int index, Schema schema, Object data) {
+            if (data == null) {
+                return;
+            }
+            Object outputData = avroData.fromConnectData(schema, data);
+            if (outputData instanceof NonRecordContainer) {
+                outputData = ((NonRecordContainer) outputData).getValue();
+            }
+            record.put(index, outputData);
+        }
+
+        @Override
+        public void close() {
+            try {
+                writer.close();
+            } catch (IOException exc) {
+                throw new DataException(exc);
+            }
+
+        }
+
+        @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+        @Override
+        public void commit() {
         }
     }
 }
