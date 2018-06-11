@@ -1,0 +1,8 @@
+/build/
+/config/
+/LICENSE
+/out/
+/README.md
+/.git/
+/.idea/
+/.gradle/

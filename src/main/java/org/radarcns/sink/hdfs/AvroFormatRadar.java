@@ -16,16 +16,37 @@
 
 package org.radarcns.sink.hdfs;
 
-import io.confluent.connect.hdfs.RecordWriterProvider;
-import io.confluent.connect.hdfs.avro.AvroFormat;
+import io.confluent.connect.avro.AvroData;
+import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
+import io.confluent.connect.hdfs.avro.AvroFileReader;
+import io.confluent.connect.hdfs.avro.AvroHiveFactory;
+import io.confluent.connect.hdfs.storage.HdfsStorage;
+import io.confluent.connect.storage.format.Format;
+import io.confluent.connect.storage.format.RecordWriterProvider;
+import io.confluent.connect.storage.format.SchemaFileReader;
+import io.confluent.connect.storage.hive.HiveFactory;
+import org.apache.hadoop.fs.Path;
 
 /**
  * Extended AvroFormat class to support custom AvroRecordWriter to allow writting key and value to
  * HDFS.
  */
-public class AvroFormatRadar extends AvroFormat {
+public class AvroFormatRadar implements Format<HdfsSinkConnectorConfig, Path> {
+    private final AvroData avroData;
 
-    public RecordWriterProvider getRecordWriterProvider() {
-        return new AvroRecordWriterProviderRadar();
+    public AvroFormatRadar(HdfsStorage storage) {
+        this.avroData = new AvroData(storage.conf().getInt("schema.cache.size"));
+    }
+
+    public RecordWriterProvider<HdfsSinkConnectorConfig> getRecordWriterProvider() {
+        return new AvroRecordWriterProviderRadar(this.avroData);
+    }
+
+    public SchemaFileReader<HdfsSinkConnectorConfig, Path> getSchemaFileReader() {
+        return new AvroFileReader(this.avroData);
+    }
+
+    public HiveFactory getHiveFactory() {
+        return new AvroHiveFactory(this.avroData);
     }
 }

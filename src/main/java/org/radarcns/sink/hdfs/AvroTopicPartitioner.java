@@ -1,6 +1,7 @@
 package org.radarcns.sink.hdfs;
 
-import io.confluent.connect.hdfs.partitioner.FieldPartitioner;
+import io.confluent.connect.storage.partitioner.FieldPartitioner;
+import io.confluent.connect.storage.partitioner.Partitioner;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.kafka.connect.data.Schema;
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AvroTopicPartitioner extends FieldPartitioner {
+public class AvroTopicPartitioner extends FieldPartitioner<FieldSchema>
+        implements Partitioner<FieldSchema> {
     private static final String PARTITION_FIELD = "partition";
     private static final String KEY_SCHEMA_FIELD = "key_schema";
     private static final String VALUE_SCHEMA_FIELD = "value_schema";
@@ -19,6 +21,9 @@ public class AvroTopicPartitioner extends FieldPartitioner {
     @Override
     public void configure(Map<String, Object> config) {
         String stringType = TypeInfoFactory.stringTypeInfo.toString();
+        if (!this.hiveFields.isEmpty()) {
+            this.hiveFields.clear();
+        }
         this.hiveFields.add(new FieldSchema(PARTITION_FIELD, stringType, ""));
         this.hiveFields.add(new FieldSchema(KEY_SCHEMA_FIELD, stringType, ""));
         this.hiveFields.add(new FieldSchema(VALUE_SCHEMA_FIELD, stringType, ""));

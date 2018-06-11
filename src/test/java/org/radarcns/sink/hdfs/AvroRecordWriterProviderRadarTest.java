@@ -20,38 +20,40 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import io.confluent.connect.avro.AvroData;
-import io.confluent.connect.hdfs.RecordWriter;
+import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.confluent.connect.storage.format.RecordWriter;
 import org.apache.avro.file.DataFileWriter;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.Before;
 import org.junit.Test;
-import org.radarcns.sink.hdfs.AvroRecordWriterProviderRadar;
 
 public class AvroRecordWriterProviderRadarTest {
-    private AvroData avroData;
     private AvroRecordWriterProviderRadar provider;
-    private Configuration conf;
+    private HdfsSinkConnectorConfig conf;
     private String outputFile;
 
     @Before
     public void setUp() throws IOException {
-        provider = new AvroRecordWriterProviderRadar();
         outputFile = File.createTempFile("AvroTest", null).getAbsolutePath();
-        conf = new Configuration();
-        avroData = new AvroData(100);
+        Map<String, String> props = new HashMap<>();
+        props.put(HdfsSinkConnectorConfig.FLUSH_SIZE_CONFIG,"15000");
+        conf = new HdfsSinkConnectorConfig(props);
+        AvroData avroData = new AvroData(100);
+        provider = new AvroRecordWriterProviderRadar(avroData);
     }
-
 
     @Test
     public void recordWriter() throws Exception {
         SinkRecord record = new SinkRecord("mine", 0, null, null,
                 SchemaBuilder.string().build(), "hi", 0);
-        RecordWriter<SinkRecord> writer = provider.getRecordWriter(
-                conf, outputFile, record, avroData);
+        RecordWriter writer = provider.getRecordWriter(
+                conf, outputFile);
         writer.write(record);
         writer.write(new SinkRecord("mine", 0, null, "withData",
                 SchemaBuilder.string().build(), "hi", 0));
@@ -63,8 +65,9 @@ public class AvroRecordWriterProviderRadarTest {
     public void recordWriterWrongSchema() throws Exception {
         SinkRecord record = new SinkRecord("mine", 0, SchemaBuilder.string().build(),
                 "something", SchemaBuilder.string().build(), "hi", 0);
-        RecordWriter<SinkRecord> writer = provider.getRecordWriter(
-                conf, outputFile, record, avroData);
+        RecordWriter writer = provider.getRecordWriter(
+                conf, outputFile);
+        writer.write(record);
         writer.write(new SinkRecord("mine", 0, null, null,
                     SchemaBuilder.string().build(), "hi", 0));
         writer.close();
