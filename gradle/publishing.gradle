@@ -23,6 +23,7 @@ artifacts {
 publishing {
     publications {
         RadarPublication(MavenPublication) {
+            from components.java
 
             artifact sourcesJar {
                 classifier 'sources'
@@ -33,9 +34,9 @@ publishing {
             }
 
             pom {
-                name = 'radar-hdfs-sink-connector'
+                name = project.name
                 description = 'A HDFS Sink connector for RADAR-CNS platform.'
-                url = 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git'
+                url = githubUrl
                 licenses {
                     license {
                         name = 'The Apache Software License, Version 2.0'
@@ -75,8 +76,8 @@ bintray {
     override false
     publications 'RadarPublication'
     pkg {
-        repo = 'org.radarcns'
-        name = 'radar-hdfs-sink-connector'
+        repo = project.group
+        name = project.name
         userOrg = 'radar-cns'
         licenses = ['Apache-2.0']
         vcsUrl = githubUrl
