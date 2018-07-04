@@ -23,6 +23,7 @@ import io.confluent.connect.storage.format.RecordWriterProvider;
 import io.confluent.kafka.serializers.NonRecordContainer;
 import io.confluent.connect.storage.format.Format;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumWriter;
@@ -138,6 +139,7 @@ public class AvroRecordWriterProviderRadar implements
                     logger.info("Opening record writer for: {}", s);
                     final FSDataOutputStream out = path.getFileSystem(hdfsSinkConnectorConfig.
                             getHadoopConfiguration()).create(path);
+                    this.writer.setCodec(CodecFactory.fromString(hdfsSinkConnectorConfig.getAvroCodec()));
                     this.writer.create(combinedSchema, out);
                 } catch (IOException exc) {
                     throw new ConnectException(exc);
