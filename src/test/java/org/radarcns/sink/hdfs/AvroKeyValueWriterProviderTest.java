@@ -33,8 +33,8 @@ import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AvroRecordWriterProviderRadarTest {
-    private AvroRecordWriterProviderRadar provider;
+public class AvroKeyValueWriterProviderTest {
+    private AvroKeyValueWriterProvider provider;
     private HdfsSinkConnectorConfig conf;
     private String outputFile;
 
@@ -45,7 +45,7 @@ public class AvroRecordWriterProviderRadarTest {
         props.put(HdfsSinkConnectorConfig.FLUSH_SIZE_CONFIG,"15000");
         conf = new HdfsSinkConnectorConfig(props);
         AvroData avroData = new AvroData(100);
-        provider = new AvroRecordWriterProviderRadar(avroData);
+        provider = new AvroKeyValueWriterProvider(avroData);
     }
 
     @Test

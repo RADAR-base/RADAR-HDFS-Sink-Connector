@@ -1,9 +1,10 @@
 plugins {
     // Apply the java plugin to add support for Java
     id 'java-library'
-    id 'com.jfrog.bintray' version '1.8.0' apply false
+    id 'com.jfrog.bintray' version '1.8.1' apply false
 }
 
+group = 'org.radarcns'
 version '0.2.1-SNAPSHOT'
 
 targetCompatibility = '1.8'
@@ -11,8 +12,6 @@ sourceCompatibility = '1.8'
 
 ext.confluentVersion = '4.1.0'
 ext.kafkaVersion = '1.1.0-cp1'
-ext.codacyVersion = '4.0.0'
-
 
 configurations {
     codacy
@@ -31,8 +30,6 @@ dependencies {
     compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
 
     compileOnly group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
-
-    codacy group: 'com.github.codacy', name: 'codacy-coverage-reporter', version: codacyVersion
 }
 
 jar {
@@ -43,7 +40,7 @@ jar {
 }
 
 wrapper {
-    gradleVersion '4.4'
+    gradleVersion '4.8'
 }
 
 if (!hasProperty('profile')) {

@@ -57,7 +57,6 @@ flush.size=15000
 hdfs.url=hdfs://namenode:8020
 format.class=org.radarcns.sink.hdfs.AvroFormatRadar
 topics.dir=topicAndroidNew
-partitioner.class=org.radarcns.sink.hdfs.AvroTopicPartitioner
 ```
 
 The docker-compose service could be defined as follows:

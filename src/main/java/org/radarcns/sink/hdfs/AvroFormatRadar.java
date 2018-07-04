@@ -27,6 +27,8 @@ import io.confluent.connect.storage.format.SchemaFileReader;
 import io.confluent.connect.storage.hive.HiveFactory;
 import org.apache.hadoop.fs.Path;
 
+import static io.confluent.connect.storage.StorageSinkConnectorConfig.SCHEMA_CACHE_SIZE_CONFIG;
+
 /**
  * Extended AvroFormat class to support custom AvroRecordWriter to allow writting key and value to
  * HDFS.
@@ -35,11 +37,11 @@ public class AvroFormatRadar implements Format<HdfsSinkConnectorConfig, Path> {
     private final AvroData avroData;
 
     public AvroFormatRadar(HdfsStorage storage) {
-        this.avroData = new AvroData(storage.conf().getInt("schema.cache.size"));
+        this.avroData = new AvroData(storage.conf().getInt(SCHEMA_CACHE_SIZE_CONFIG));
     }
 
     public RecordWriterProvider<HdfsSinkConnectorConfig> getRecordWriterProvider() {
-        return new AvroRecordWriterProviderRadar(this.avroData);
+        return new AvroKeyValueWriterProvider(this.avroData);
     }
 
     public SchemaFileReader<HdfsSinkConnectorConfig, Path> getSchemaFileReader() {

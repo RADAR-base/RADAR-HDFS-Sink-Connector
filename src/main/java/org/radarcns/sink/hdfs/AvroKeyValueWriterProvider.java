@@ -23,6 +23,7 @@ import io.confluent.connect.storage.format.RecordWriterProvider;
 import io.confluent.kafka.serializers.NonRecordContainer;
 import io.confluent.connect.storage.format.Format;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumWriter;
@@ -52,15 +53,14 @@ import static org.apache.avro.Schema.Type.NULL;
  * <p>To use, implement a {@link Format#getRecordWriterProvider()} that returns this class (i.e.,
  * {@link AvroFormatRadar}), and provide that in the `format.class` property.
  */
-public class AvroRecordWriterProviderRadar implements
-        RecordWriterProvider<HdfsSinkConnectorConfig> {
+public class AvroKeyValueWriterProvider implements RecordWriterProvider<HdfsSinkConnectorConfig> {
 
     private static final Logger logger = LoggerFactory.getLogger(
-            AvroRecordWriterProviderRadar.class);
+            AvroKeyValueWriterProvider.class);
     private final AvroData avroData;
     private static final String EXTENSION = ".avro";
 
-    public AvroRecordWriterProviderRadar(AvroData avroData) {
+    public AvroKeyValueWriterProvider(AvroData avroData) {
         this.avroData = avroData;
     }
 
@@ -69,17 +69,14 @@ public class AvroRecordWriterProviderRadar implements
         return EXTENSION;
     }
 
-
     /**
      * Constructs a RecordWriter that assumes that all {@link SinkRecord} objects provided to it
      * have the same schema and that the record indeed HAS both a key and value schema.
      */
     @Override
-    public RecordWriter getRecordWriter(final HdfsSinkConnectorConfig hdfsSinkConnectorConfig,
-                                        String s) {
-        return new MyRecordWriter(s, hdfsSinkConnectorConfig);
+    public RecordWriter getRecordWriter(HdfsSinkConnectorConfig conf, String filename) {
+        return new AvroKeyValueWriter(conf, filename);
     }
-
 
     private String getSchemaName(Schema schema) {
         if (schema != null) {
@@ -103,18 +100,18 @@ public class AvroRecordWriterProviderRadar implements
         }
     }
 
-    private class MyRecordWriter implements RecordWriter {
+    private class AvroKeyValueWriter implements RecordWriter {
         private final DataFileWriter<Object> writer;
         private final Path path;
-        private final String s;
-        private final HdfsSinkConnectorConfig hdfsSinkConnectorConfig;
+        private final String filename;
+        private final HdfsSinkConnectorConfig config;
         private org.apache.avro.Schema combinedSchema;
 
-        private MyRecordWriter(String s, HdfsSinkConnectorConfig hdfsSinkConnectorConfig) {
-            this.s = s;
-            this.hdfsSinkConnectorConfig = hdfsSinkConnectorConfig;
+        private AvroKeyValueWriter(HdfsSinkConnectorConfig config, String filename) {
+            this.filename = filename;
+            this.config = config;
             writer = new DataFileWriter<>(new GenericDatumWriter<>());
-            path = new Path(s);
+            path = new Path(filename);
             combinedSchema = null;
         }
 
@@ -135,16 +132,17 @@ public class AvroRecordWriterProviderRadar implements
                         .endRecord();
 
                 try {
-                    logger.info("Opening record writer for: {}", s);
-                    final FSDataOutputStream out = path.getFileSystem(hdfsSinkConnectorConfig.
-                            getHadoopConfiguration()).create(path);
+                    logger.info("Opening record writer for: {}", filename);
+                    FSDataOutputStream out = path.getFileSystem(config.getHadoopConfiguration())
+                            .create(path);
+                    this.writer.setCodec(CodecFactory.fromString(config.getAvroCodec()));
                     this.writer.create(combinedSchema, out);
                 } catch (IOException exc) {
                     throw new ConnectException(exc);
                 }
             }
 
-            logger.trace("Sink record: {}", record.toString());
+            logger.trace("Sink record: {}", record);
 
             GenericRecord combinedRecord = new GenericData.Record(combinedSchema);
             write(combinedRecord, 0, keySchema, record.key());
