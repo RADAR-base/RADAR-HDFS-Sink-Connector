@@ -30,7 +30,8 @@ repositories {
 
 dependencies {
     api group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
-    implementation group: 'org.radarcns', name: 'radar-commons-unsafe', version: radarCommonsVersion
+
+    runtimeOnly group: 'org.radarcns', name: 'radar-commons-unsafe', version: radarCommonsVersion
 
     compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
 
