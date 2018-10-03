@@ -175,9 +175,9 @@ public class AvroKeyValueWriterProvider implements RecordWriterProvider<HdfsSink
 
         }
 
-        @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
         @Override
         public void commit() {
+            // do nothing
         }
     }
 }

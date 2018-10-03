@@ -10,8 +10,11 @@ version '0.2.1-SNAPSHOT'
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
-ext.confluentVersion = '4.1.0'
-ext.kafkaVersion = '1.1.0-cp1'
+ext {
+    confluentVersion = '5.0.0'
+    kafkaVersion = '2.0.0-cp1'
+    radarCommonsVersion = '0.10.0'
+}
 
 configurations {
     codacy
@@ -27,9 +30,12 @@ repositories {
 
 dependencies {
     api group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
+
+    runtimeOnly group: 'org.radarcns', name: 'radar-commons-unsafe', version: radarCommonsVersion
+
     compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
 
-    compileOnly group: 'org.apache.kafka', name: 'kafka_2.11', version: kafkaVersion
+    compileOnly group: 'org.apache.kafka', name: 'kafka_2.12', version: kafkaVersion
 }
 
 jar {
@@ -40,7 +46,7 @@ jar {
 }
 
 wrapper {
-    gradleVersion '4.8'
+    gradleVersion '4.9'
 }
 
 if (!hasProperty('profile')) {
