@@ -1,7 +1,7 @@
 plugins {
     // Apply the java plugin to add support for Java
     id 'java-library'
-    id 'com.jfrog.bintray' version '1.8.1' apply false
+    id 'com.jfrog.bintray' version '1.8.4' apply false
 }
 
 group = 'org.radarcns'
@@ -11,9 +11,9 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 ext {
-    confluentVersion = '5.0.0'
-    kafkaVersion = '2.0.0-cp1'
-    radarCommonsVersion = '0.10.0'
+    confluentVersion = '5.1.0'
+    kafkaVersion = '2.1.0-cp1'
+    radarCommonsVersion = '0.11.3'
 }
 
 configurations {
@@ -46,7 +46,7 @@ jar {
 }
 
 wrapper {
-    gradleVersion '4.9'
+    gradleVersion '5.2'
 }
 
 if (!hasProperty('profile')) {
