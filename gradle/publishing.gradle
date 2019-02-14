@@ -1,22 +1,9 @@
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-def pomConfig = {
-    licenses {
-        license {
-            name "The Apache Software License, Version 2.0"
-            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            distribution "repo"
-        }
-    }
-    developers {
-        developer {
-            id "radar-cns"
-            name "Nivethika"
-            email "nivethika@thehyve.nl"
-        }
-    }
-}
+ext.website = 'https://radar-base.org'
+ext.githubUrl = 'https://github.com/RADAR-base/RADAR-HDFS-Sink-Connector'
+
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
@@ -33,22 +20,49 @@ artifacts {
     archives sourcesJar, javadocJar
 }
 
-
 publishing {
     publications {
         RadarPublication(MavenPublication) {
             from components.java
-            artifact sourcesJar
-            artifact javadocJar
-            groupId 'org.radarcns'
-            artifactId 'radar-hdfs-sink-connector'
-            version project.version
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', 'A HDFS Sink connector for RADAR-CNS platform.')
-                root.appendNode('name', 'radar-hdfs-sink-connector')
-                root.appendNode('url', 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git')
-                root.children().last() + pomConfig
+
+            artifact sourcesJar {
+                classifier 'sources'
+            }
+
+            artifact javadocJar {
+                classifier 'javadoc'
+            }
+
+            pom {
+                name = project.name
+                description = 'A HDFS Sink connector for RADAR-CNS platform.'
+                url = githubUrl
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'radar-cns'
+                        name = 'Nivethika'
+                        email = 'nivethika@thehyve.nl'
+                    }
+                }
+                issueManagement {
+                    system = 'GitHub'
+                    url = githubUrl + '/issues'
+                }
+                organization {
+                    name = 'RADAR-base'
+                    url = website
+                }
+                scm {
+                    connection = 'scm:git:' + githubUrl
+                    url = githubUrl
+                }
             }
         }
     }
@@ -57,19 +71,19 @@ publishing {
 
 
 bintray {
-    user = System.getenv('BINTRAY_USER')? System.getenv('BINTRAY_USER') : project.property('bintrayUser')
-    key = System.getenv('BINTRAY_API_KEY') ? System.getenv('BINTRAY_API_KEY') : project.property('bintrayApiKey')
-    override = false
-    publications = ['RadarPublication']
+    user System.getenv('BINTRAY_USER')? System.getenv('BINTRAY_USER') : project.property('bintrayUser')
+    key System.getenv('BINTRAY_API_KEY') ? System.getenv('BINTRAY_API_KEY') : project.property('bintrayApiKey')
+    override false
+    publications 'RadarPublication'
     pkg {
-        repo = 'org.radarcns'
-        name = 'radar-hdfs-sink-connector'
+        repo = project.group
+        name = project.name
         userOrg = 'radar-cns'
         licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/RADAR-CNS/RADAR-HDFS-Sink-Connector.git'
+        vcsUrl = githubUrl
         version {
             name = project.version
-            desc = 'RADAR-HDFS-Sink-Connector: Initial release'
+            desc = 'RADAR-HDFS-Sink-Connector'
             vcsTag = System.getenv('TRAVIS_TAG')
         }
     }

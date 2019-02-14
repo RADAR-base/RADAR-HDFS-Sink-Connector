@@ -16,7 +16,10 @@
 
 package org.radarcns.sink.hdfs;
 
+import static io.confluent.connect.storage.StorageSinkConnectorConfig.SCHEMA_CACHE_SIZE_CONFIG;
+
 import io.confluent.connect.avro.AvroData;
+import io.confluent.connect.avro.AvroDataConfig;
 import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
 import io.confluent.connect.hdfs.avro.AvroFileReader;
 import io.confluent.connect.hdfs.avro.AvroHiveFactory;
@@ -35,11 +38,18 @@ public class AvroFormatRadar implements Format<HdfsSinkConnectorConfig, Path> {
     private final AvroData avroData;
 
     public AvroFormatRadar(HdfsStorage storage) {
-        this.avroData = new AvroData(storage.conf().getInt("schema.cache.size"));
+        AvroDataConfig avroConfig = new AvroDataConfig.Builder()
+                .with(AvroDataConfig.CONNECT_META_DATA_CONFIG, false)
+                .with(AvroDataConfig.SCHEMAS_CACHE_SIZE_CONFIG,
+                        storage.conf().getInt(SCHEMA_CACHE_SIZE_CONFIG))
+                .with(AvroDataConfig.ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG, true)
+                .build();
+
+        this.avroData = new AvroData(avroConfig);
     }
 
     public RecordWriterProvider<HdfsSinkConnectorConfig> getRecordWriterProvider() {
-        return new AvroRecordWriterProviderRadar(this.avroData);
+        return new AvroKeyValueWriterProvider(this.avroData);
     }
 
     public SchemaFileReader<HdfsSinkConnectorConfig, Path> getSchemaFileReader() {

@@ -1,31 +1,23 @@
 #!/bin/bash
 
 # Check if variables exist
-if [ -z "$CONNECT_ZOOKEEPER_CONNECT" ]; then
-    echo "CONNECT_ZOOKEEPER_CONNECT is not defined"
-    exit 2
-fi
-
-if [ -z "$CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL" ]; then
-    echo "CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL is not defined"
-    exit 4
-fi
-
-KAFKA_BROKERS=${KAFKA_BROKERS:-3}
+zookeeper_url=${CONNECT_ZOOKEEPER_CONNECT:?}
+schema_url=${CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL:?}
+num_brokers=${KAFKA_BROKERS:-3}
 
 max_timeout=32
 
 tries=10
 timeout=1
 while true; do
-    ZOOKEEPER_CHECK=$(zookeeper-shell ${CONNECT_ZOOKEEPER_CONNECT} <<< "ls /brokers/ids" | tail -2 | head -1)
+    ZOOKEEPER_CHECK=$(zookeeper-shell ${zookeeper_url} <<< "ls /brokers/ids" | tail -2 | head -1)
     echo "Zookeeper response: ${ZOOKEEPER_CHECK}"
     # ZOOKEEPER_CHECK="${ZOOKEEPER_CHECK##*$'\n'}"
     ZOOKEEPER_CHECK="$(echo -e "${ZOOKEEPER_CHECK}" | tr -d '[:space:]'  | tr -d '['  | tr -d ']')"
 
     IFS=',' read -r -a array <<< ${ZOOKEEPER_CHECK}
     LENGTH=${#array[@]}
-    if [ "$LENGTH" -eq "$KAFKA_BROKERS" ]; then
+    if [ "$LENGTH" -eq "$num_brokers" ]; then
         echo "Kafka brokers available."
         break
     fi
@@ -35,7 +27,7 @@ while true; do
         echo "FAILED: KAFKA BROKERs NOT READY."
         exit 5
     fi
-    echo "Expected $KAFKA_BROKERS brokers but found only $LENGTH. Waiting $timeout second before retrying ..."
+    echo "Expected $num_brokers brokers but found only $LENGTH. Waiting $timeout second before retrying ..."
     sleep ${timeout}
     if [ ${timeout} -lt ${max_timeout} ]; then
         timeout=$((timeout * 2))
@@ -45,7 +37,7 @@ done
 tries=10
 timeout=1
 while true; do
-    if wget --spider -q "${CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL}/subjects" 2>/dev/null; then
+    if wget --spider -q "${schema_url}/subjects" 2>/dev/null; then
         echo "Schema registry available."
         break
     fi

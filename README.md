@@ -20,7 +20,6 @@ Contains HDFS-Sink-Connector of RADAR-base platform
     flush.size=1200
     hdfs.url=hdfs://localhost:9000
     format.class=org.radarcns.sink.hdfs.AvroFormatRadar
-    partitioner.class=org.radarcns.sink.hdfs.AvroTopicPartitioner
     ```
    
 4. Run the connector. To run the connector in `standalone mode` (on an enviornment confluent platform is installed)
@@ -57,7 +56,6 @@ flush.size=15000
 hdfs.url=hdfs://namenode:8020
 format.class=org.radarcns.sink.hdfs.AvroFormatRadar
 topics.dir=topicAndroidNew
-partitioner.class=org.radarcns.sink.hdfs.AvroTopicPartitioner
 ```
 
 The docker-compose service could be defined as follows:

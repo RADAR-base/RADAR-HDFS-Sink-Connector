@@ -30,7 +30,7 @@ COPY ./src/ /code/src
 
 RUN ./gradlew jar
 
-FROM confluentinc/cp-kafka-connect-base:4.1.0
+FROM confluentinc/cp-kafka-connect-base:5.0.0
 
 MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 
@@ -42,7 +42,7 @@ COPY --from=builder /code/build/third-party/*.jar ${CONNECT_PLUGIN_PATH}/radar-h
 COPY --from=builder /code/build/libs/*.jar ${CONNECT_PLUGIN_PATH}/radar-hdfs-sink-connector/
 
 # To isolate the classpath from the plugin path as recommended
-COPY --from=builder /code/build/libs/*.jar /etc/kafka-connect/radar-hdfs-sink-connector/
+COPY --from=builder /code/build/third-party/radar-commons-unsafe-*.jar /etc/kafka-connect/radar-hdfs-sink-connector/
 
 # Load topics validator
 COPY ./src/main/docker/kafka-wait /usr/bin/kafka-wait

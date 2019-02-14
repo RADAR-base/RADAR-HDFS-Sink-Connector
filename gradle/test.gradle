@@ -1,6 +1,28 @@
 ext.junitVersion = '4.12'
 
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+//---------------------------------------------------------------------------//
+// Source Set                                                                //
+//---------------------------------------------------------------------------//
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + main.compileClasspath + test.output + test.compileClasspath
+            runtimeClasspath += main.output + test.output + test.compileClasspath
+        }
+        resources {
+            srcDir 'src/integrationTest/resources'
+        }
+    }
+}
+
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: junitVersion
     testImplementation group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
+
+    integrationTestImplementation group: 'org.radarcns', name: 'radar-commons-testing', version: '0.9.0'
 }
