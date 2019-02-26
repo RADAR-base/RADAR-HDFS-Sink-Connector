@@ -6,7 +6,7 @@ services:
   # Zookeeper Cluster                                                         #
   #---------------------------------------------------------------------------#
   zookeeper-1:
-    image: confluentinc/cp-zookeeper:4.1.0
+    image: confluentinc/cp-zookeeper:5.1.2
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -19,7 +19,7 @@ services:
   # Kafka Cluster                                                             #
   #---------------------------------------------------------------------------#
   kafka-1:
-    image: confluentinc/cp-kafka:4.1.0
+    image: confluentinc/cp-kafka:5.1.2
     depends_on:
       - zookeeper-1
     environment:
@@ -31,7 +31,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
   kafka-2:
-    image: confluentinc/cp-kafka:4.1.0
+    image: confluentinc/cp-kafka:5.1.2
     depends_on:
       - zookeeper-1
     environment:
@@ -43,7 +43,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
   kafka-3:
-    image: confluentinc/cp-kafka:4.1.0
+    image: confluentinc/cp-kafka:5.1.2
     depends_on:
       - zookeeper-1
     environment:
@@ -58,7 +58,7 @@ services:
   # Schema Registry                                                           #
   #---------------------------------------------------------------------------#
   schema-registry-1:
-    image: confluentinc/cp-schema-registry:4.1.0
+    image: confluentinc/cp-schema-registry:5.1.2
     depends_on:
       - zookeeper-1
       - kafka-1
@@ -78,7 +78,7 @@ services:
   # REST proxy                                                                #
   #---------------------------------------------------------------------------#
   rest-proxy-1:
-    image: confluentinc/cp-kafka-rest:4.1.0
+    image: confluentinc/cp-kafka-rest:5.1.2
     depends_on:
       - kafka-1
       - kafka-2

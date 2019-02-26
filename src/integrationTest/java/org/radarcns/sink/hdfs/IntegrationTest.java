@@ -1,6 +1,7 @@
 package org.radarcns.sink.hdfs;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaValidationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -11,7 +12,9 @@ import org.radarcns.kafka.ObservationKey;
 import org.radarcns.passive.phone.PhoneLight;
 import org.radarcns.passive.phone.PhoneSmsUnread;
 import org.radarcns.producer.KafkaTopicSender;
+import org.radarcns.producer.rest.RestClient;
 import org.radarcns.producer.rest.RestSender;
+import org.radarcns.producer.rest.RestSender.Builder;
 import org.radarcns.producer.rest.SchemaRetriever;
 import org.radarcns.topic.AvroTopic;
 import org.slf4j.Logger;
@@ -28,9 +31,11 @@ public class IntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
 
     @Test(timeout = 120_000L)
-    public void integrationTest() throws IOException, InterruptedException {
-        RestSender sender = new RestSender.Builder()
-                .server(new ServerConfig("http://localhost:8082"))
+    public void integrationTest() throws IOException, InterruptedException, SchemaValidationException {
+        RestSender sender = new Builder()
+                .httpClient(RestClient.global()
+                        .server(new ServerConfig("http://localhost:8082"))
+                        .build())
                 .schemaRetriever(new SchemaRetriever(
                         new ServerConfig("http://localhost:8081"), 5))
                 .build();
@@ -49,11 +54,11 @@ public class IntegrationTest {
                         + "{\"name\":\"light\",\"type\":[\"null\",\"float\"],"
                         + "\"doc\":\"Illuminance (lx).\"}]}");
 
-        AvroTopic<ObservationKey, PhoneLight> test2 = new AvroTopic<>("test",
+        AvroTopic<ObservationKey, PhoneLight> test2 = new AvroTopic<>("test1",
                 ObservationKey.getClassSchema(), updatePhoneSchema,
                 ObservationKey.class, PhoneLight.class);
 
-        AvroTopic<ObservationKey, PhoneSmsUnread> test3 = new AvroTopic<>("test",
+        AvroTopic<ObservationKey, PhoneSmsUnread> test3 = new AvroTopic<>("test2",
                 ObservationKey.getClassSchema(), PhoneSmsUnread.getClassSchema(),
                 ObservationKey.class, PhoneSmsUnread.class);
 
@@ -78,10 +83,8 @@ public class IntegrationTest {
                     .stream()
                     .filter(s -> !s.contains("+tmp"))
                     .collect(Collectors.toList());
+            logger.info("Paths:\n\t{}", String.join("\n\t", filePaths));
             if (filePaths.size() >= 3) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Paths:\n\t{}", String.join("\n\t", filePaths));
-                }
                 filePaths.forEach(p -> assertTrue(p.endsWith(".avro")));
                 break;
             }
