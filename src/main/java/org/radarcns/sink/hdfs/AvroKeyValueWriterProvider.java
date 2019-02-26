@@ -16,12 +16,17 @@
 
 package org.radarcns.sink.hdfs;
 
+import static io.confluent.connect.avro.AvroData.ANYTHING_SCHEMA;
+import static org.apache.avro.Schema.Type.NULL;
+
 import io.confluent.connect.avro.AvroData;
 import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
+import io.confluent.connect.storage.format.Format;
 import io.confluent.connect.storage.format.RecordWriter;
 import io.confluent.connect.storage.format.RecordWriterProvider;
 import io.confluent.kafka.serializers.NonRecordContainer;
-import io.confluent.connect.storage.format.Format;
+import java.io.IOException;
+import java.util.Arrays;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
@@ -36,12 +41,6 @@ import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Arrays;
-
-import static io.confluent.connect.avro.AvroData.ANYTHING_SCHEMA;
-import static org.apache.avro.Schema.Type.NULL;
 
 /**
  * Writes data to HDFS using the Confluent Kafka HDFS connector.
@@ -120,9 +119,10 @@ public class AvroKeyValueWriterProvider implements RecordWriterProvider<HdfsSink
             final Schema keySchema = record.keySchema();
             final Schema valueSchema = record.valueSchema();
             if (this.combinedSchema == null) {
-                SchemaBuilder.RecordBuilder<org.apache.avro.Schema> builder = SchemaBuilder.
-                        record(getSchemaName(keySchema) + "_" + getSchemaName(valueSchema)).
-                        namespace("org.radarcns.combined").doc("combined key-value record");
+                SchemaBuilder.RecordBuilder<org.apache.avro.Schema> builder = SchemaBuilder
+                        .record(getSchemaName(keySchema) + "_" + getSchemaName(valueSchema))
+                        .namespace("org.radarcns.combined")
+                        .doc("combined key-value record");
 
                 this.combinedSchema = builder.fields()
                         .name("key").doc("Key of a Kafka SinkRecord")

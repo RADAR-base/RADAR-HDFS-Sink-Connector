@@ -16,6 +16,11 @@
 
 package org.radarcns.sink.hdfs;
 
+import static io.confluent.connect.avro.AvroDataConfig.CONNECT_META_DATA_CONFIG;
+import static io.confluent.connect.avro.AvroDataConfig.ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG;
+import static io.confluent.connect.avro.AvroDataConfig.SCHEMAS_CACHE_SIZE_CONFIG;
+import static io.confluent.connect.storage.StorageSinkConnectorConfig.SCHEMA_CACHE_SIZE_CONFIG;
+
 import io.confluent.connect.avro.AvroData;
 import io.confluent.connect.avro.AvroDataConfig;
 import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
@@ -26,14 +31,8 @@ import io.confluent.connect.storage.format.Format;
 import io.confluent.connect.storage.format.RecordWriterProvider;
 import io.confluent.connect.storage.format.SchemaFileReader;
 import io.confluent.connect.storage.hive.HiveFactory;
-import org.apache.hadoop.fs.Path;
-
 import java.util.Map;
-
-import static io.confluent.connect.avro.AvroDataConfig.CONNECT_META_DATA_CONFIG;
-import static io.confluent.connect.avro.AvroDataConfig.ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG;
-import static io.confluent.connect.avro.AvroDataConfig.SCHEMAS_CACHE_SIZE_CONFIG;
-import static io.confluent.connect.storage.StorageSinkConnectorConfig.SCHEMA_CACHE_SIZE_CONFIG;
+import org.apache.hadoop.fs.Path;
 
 /**
  * Extended AvroFormat class to support custom AvroRecordWriter to allow writing key and value to
@@ -42,14 +41,21 @@ import static io.confluent.connect.storage.StorageSinkConnectorConfig.SCHEMA_CAC
 public class AvroFormatRadar implements Format<HdfsSinkConnectorConfig, Path> {
     private final AvroData avroData;
 
+    /**
+     * Avro Format with fixed AvroData instance.
+     * @param storage data storage used for configuration.
+     */
     public AvroFormatRadar(HdfsStorage storage) {
         @SuppressWarnings("unchecked")
         Map<String, Object> conf = (Map<String, Object>) storage.conf().plainValues();
 
         this.avroData = new AvroData(new AvroDataConfig.Builder()
-                .with(CONNECT_META_DATA_CONFIG, conf.getOrDefault(CONNECT_META_DATA_CONFIG, false))
-                .with(SCHEMAS_CACHE_SIZE_CONFIG, conf.getOrDefault(SCHEMA_CACHE_SIZE_CONFIG, 1000))
-                .with(ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG, conf.getOrDefault(ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG, true))
+                .with(CONNECT_META_DATA_CONFIG,
+                        conf.getOrDefault(CONNECT_META_DATA_CONFIG, false))
+                .with(SCHEMAS_CACHE_SIZE_CONFIG,
+                        conf.getOrDefault(SCHEMA_CACHE_SIZE_CONFIG, 1000))
+                .with(ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG,
+                        conf.getOrDefault(ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG, true))
                 .build());
     }
 

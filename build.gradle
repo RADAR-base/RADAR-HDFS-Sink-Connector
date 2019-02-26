@@ -11,9 +11,9 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 ext {
-    confluentVersion = '5.1.0'
-    kafkaVersion = '2.1.0-cp1'
-    radarCommonsVersion = '0.11.3'
+    confluentVersion = '5.1.2'
+    kafkaVersion = '2.1.1'
+    radarCommonsVersion = '0.12.0-SNAPSHOT'
 }
 
 configurations {
@@ -26,6 +26,7 @@ repositories {
     maven { url 'http://packages.confluent.io/maven/' }
     maven { url 'https://jitpack.io' }
     maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
+    maven { url 'http://oss.jfrog.org/artifactory/oss-snapshot-local/' }
 }
 
 dependencies {
@@ -46,7 +47,7 @@ jar {
 }
 
 wrapper {
-    gradleVersion '5.2'
+    gradleVersion '5.2.1'
 }
 
 if (!hasProperty('profile')) {
