@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.radarcns.sink.hdfs;
+package org.radarbase.sink.hdfs;
 
 import static io.confluent.connect.avro.AvroDataConfig.CONNECT_META_DATA_CONFIG;
 import static io.confluent.connect.avro.AvroDataConfig.ENHANCED_AVRO_SCHEMA_SUPPORT_CONFIG;

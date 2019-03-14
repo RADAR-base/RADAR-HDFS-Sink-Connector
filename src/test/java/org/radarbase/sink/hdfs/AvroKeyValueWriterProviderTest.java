@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.radarcns.sink.hdfs;
+package org.radarbase.sink.hdfs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +32,7 @@ import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.junit.Before;
 import org.junit.Test;
+import org.radarbase.sink.hdfs.AvroKeyValueWriterProvider;
 
 public class AvroKeyValueWriterProviderTest {
     private AvroKeyValueWriterProvider provider;

@@ -130,7 +130,7 @@ services:
     ports:
       - "8020:8020"
     environment:
-      CLUSTER_NAME: radar-cns
+      CLUSTER_NAME: radar-base
       HDFS_CONF_dfs_namenode_name_dir: file:///hadoop/dfs/name
 
   #---------------------------------------------------------------------------#

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.radarcns.sink.hdfs;
+package org.radarbase.sink.hdfs;
 
 import static io.confluent.connect.avro.AvroData.ANYTHING_SCHEMA;
 import static org.apache.avro.Schema.Type.NULL;
@@ -121,7 +121,7 @@ public class AvroKeyValueWriterProvider implements RecordWriterProvider<HdfsSink
             if (this.combinedSchema == null) {
                 SchemaBuilder.RecordBuilder<org.apache.avro.Schema> builder = SchemaBuilder
                         .record(getSchemaName(keySchema) + "_" + getSchemaName(valueSchema))
-                        .namespace("org.radarcns.combined")
+                        .namespace("org.radarbase.kafka")
                         .doc("combined key-value record");
 
                 this.combinedSchema = builder.fields()

@@ -1,4 +1,4 @@
-package org.radarcns.sink.hdfs;
+package org.radarbase.sink.hdfs;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaValidationException;
@@ -7,16 +7,16 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
-import org.radarcns.config.ServerConfig;
+import org.radarbase.config.ServerConfig;
 import org.radarcns.kafka.ObservationKey;
 import org.radarcns.passive.phone.PhoneLight;
 import org.radarcns.passive.phone.PhoneSmsUnread;
-import org.radarcns.producer.KafkaTopicSender;
-import org.radarcns.producer.rest.RestClient;
-import org.radarcns.producer.rest.RestSender;
-import org.radarcns.producer.rest.RestSender.Builder;
-import org.radarcns.producer.rest.SchemaRetriever;
-import org.radarcns.topic.AvroTopic;
+import org.radarbase.producer.KafkaTopicSender;
+import org.radarbase.producer.rest.RestClient;
+import org.radarbase.producer.rest.RestSender;
+import org.radarbase.producer.rest.RestSender.Builder;
+import org.radarbase.producer.rest.SchemaRetriever;
+import org.radarbase.topic.AvroTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
