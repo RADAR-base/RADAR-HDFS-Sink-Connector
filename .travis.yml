@@ -30,7 +30,7 @@ before_install:
 
 script:
   - ./gradlew check
-  - sudo $DC -f $DC_FILE up -d && sleep 30 && ./gradlew integrationTest
+  - sudo $DC -f $DC_FILE up -d && sleep 60 && ./gradlew integrationTest
   - sudo $DC -f $DC_FILE down
 after_script:
   - ./gradlew sendCoverageToCodacy
