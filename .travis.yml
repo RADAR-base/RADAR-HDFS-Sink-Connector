@@ -29,8 +29,8 @@ before_install:
   - chmod +x $DC;
 
 script:
-  - ./gradlew check
-  - sudo $DC -f $DC_FILE up -d && sleep 60 && ./gradlew integrationTest
+  - ./gradlew check --stacktrace
+  - sudo $DC -f $DC_FILE up -d && sleep 60 && ./gradlew integrationTest --stacktrace
   - sudo $DC -f $DC_FILE down
 after_script:
   - ./gradlew sendCoverageToCodacy

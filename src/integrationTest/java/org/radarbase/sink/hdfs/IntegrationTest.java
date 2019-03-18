@@ -31,7 +31,8 @@ public class IntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
 
     @Test(timeout = 120_000L)
-    public void integrationTest() throws IOException, InterruptedException, SchemaValidationException {
+    public void integrationTest()
+            throws IOException, InterruptedException, SchemaValidationException {
         RestSender sender = new Builder()
                 .httpClient(RestClient.global()
                         .server(new ServerConfig("http://localhost:8082"))
