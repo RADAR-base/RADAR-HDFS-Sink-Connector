@@ -1,5 +1,7 @@
 package org.radarbase.sink.hdfs;
 
+import java.io.UncheckedIOException;
+import java.util.stream.Stream;
 import okhttp3.Response;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaValidationException;
@@ -66,9 +68,7 @@ public class IntegrationTest {
                 ObservationKey.getClassSchema(), PhoneSmsUnread.getClassSchema(),
                 ObservationKey.class, PhoneSmsUnread.class);
 
-        long timeout = 1_000;
-
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 200; i++) {
             try (Response response = restClient.request("topics")) {
                 String responseBody = RestClient.responseBody(response);
                 if (response.code() == 200) {
@@ -84,8 +84,7 @@ public class IntegrationTest {
             } catch (IOException ex) {
                 logger.error("Kafka not ready (failed to connect): {}", ex.toString());
             }
-            Thread.sleep(timeout);
-            timeout *= Math.min(16_000L, timeout * 2);
+            Thread.sleep(1_000L);
         }
 
         try (KafkaTopicSender<ObservationKey, PhoneLight> topicSender = sender.sender(test1)) {
@@ -112,14 +111,15 @@ public class IntegrationTest {
                     fs = path.getFileSystem(conf);
                 }
 
-                List<String> filePaths = getAllFilePath(path, fs)
-                        .stream()
-                        .filter(s -> !s.contains("+tmp"))
-                        .collect(Collectors.toList());
-                logger.info("Paths:\n\t{}", String.join("\n\t", filePaths));
-                if (filePaths.size() >= 3) {
-                    filePaths.forEach(p -> assertTrue(p.endsWith(".avro")));
-                    break;
+                long numFiles = getAllFilePath(path, fs)
+                        .filter(s -> s.endsWith(".avro"))
+                        .count();
+
+                if (numFiles > 0) {
+                    logger.info("Paths:\n\t{}", numFiles);
+                    if (numFiles >= 3) {
+                        break;
+                    }
                 }
             } catch (Exception ex) {
                 logger.error("Failed to get HDFS listing", ex);
@@ -132,18 +132,24 @@ public class IntegrationTest {
      * @param filePath HDFS path to check
      * @param fs file system the path is on.
      * @return list of absolute file path present in given path
-     * @throws IOException if a path could not be checked.
+     * @throws java.io.UncheckedIOException if a path could not be checked.
      */
-    public static List<String> getAllFilePath(Path filePath, FileSystem fs) throws IOException {
-        List<String> fileList = new ArrayList<>();
-        FileStatus[] fileStatus = fs.listStatus(filePath);
-        for (FileStatus fileStat : fileStatus) {
-            if (fileStat.isDirectory()) {
-                fileList.addAll(getAllFilePath(fileStat.getPath(), fs));
-            } else {
-                fileList.add(fileStat.getPath().toString());
-            }
+    public static Stream<String> getAllFilePath(Path filePath, FileSystem fs) {
+        try {
+            return Stream.of(fs.listStatus(filePath))
+                    .flatMap(fileStat -> {
+                        if (fileStat.isDirectory()) {
+                            if (fileStat.getPath().getName().equals("+tmp")) {
+                                return Stream.empty();
+                            } else {
+                                return getAllFilePath(fileStat.getPath(), fs);
+                            }
+                        } else {
+                            return Stream.of(fileStat.getPath().toString());
+                        }
+                    });
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
-        return fileList;
     }
 }
