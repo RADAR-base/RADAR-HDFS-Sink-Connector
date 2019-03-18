@@ -1,24 +1,28 @@
 # RADAR HDFS Sink connector
+
 Contains HDFS-Sink-Connector of RADAR-base platform
 
 ## Direct usage
 
-1. In addition to Zookeeper, Kafka-broker(s), Schema-registry and Rest-proxy, HDFS should be running
+1. This connector depends on Kafka brokers, Kafka schema registry and an HDFS cluster.
+
 2. Load the `radar-hdfs-sink-connector-*.jar` to CLASSPATH
 
     ```shell
     export CLASSPATH=/path/to/radar-hdfs-sink-connector-*.jar
     ```
       
-3. Configure HDFS Connector properties.
+3. Configure HDFS Connector properties. These particular settings will send invalid records to a dead letter queue.
 
     ```ini
     name=radar-hdfs-sink
     connector.class=io.confluent.connect.hdfs.HdfsSinkConnector
-    tasks.max=1
-    topics=mock_empatica_e4_battery_level,mock_empatica_e4_blood_volume_pulse
-    flush.size=1200
-    hdfs.url=hdfs://localhost:9000
+    tasks.max=4
+    topics=test,test1,test2
+    flush.size=16000000
+    rotate.interval.ms=54000000
+    hdfs.url=hdfs://hdfs-namenode:8020
+    topics.dir=topicAndroidNew
     format.class=org.radarbase.sink.hdfs.AvroFormatRadar
     errors.tolerance=all
     errors.deadletterqueue.topic.name=dead_letter_queue_hdfs
@@ -37,7 +41,7 @@ Contains HDFS-Sink-Connector of RADAR-base platform
 ## Docker usage
 
 To run this connector as a docker container, use the [radarbase/radar-hdfs-connector](https://hub.docker.org/radarbase/radar-hdfs-connector) docker image. See the README in the `docker` directory for more information.
-It runs the []Confluent HDFS Connector 5.1.2]([here](https://docs.confluent.io/current/connect/kafka-connect-hdfs/index.html) using a custom record write provider to store both keys and values.
+It runs the [Confluent HDFS Connector 5.1.2]([here](https://docs.confluent.io/current/connect/kafka-connect-hdfs/index.html) using a custom record write provider to store both keys and values.
 
 Create the docker image:
 ```
@@ -54,14 +58,15 @@ $ docker pull radarbase/radar-hdfs-connector:1.0.0
 This image has to be extended with a volume with appropriate `sink-hdfs.properties`, for example:
 
 ```ini
-name=radar-hdfs-sink-15000
+name=radar-hdfs-sink
 connector.class=io.confluent.connect.hdfs.HdfsSinkConnector
 tasks.max=4
-topics=topic1, topic2, ...
-flush.size=15000
-hdfs.url=hdfs://namenode:8020
-format.class=org.radarbase.sink.hdfs.AvroFormatRadar
+topics=test,test1,test2
+flush.size=16000000
+rotate.interval.ms=54000000
+hdfs.url=hdfs://hdfs-namenode:8020
 topics.dir=topicAndroidNew
+format.class=org.radarbase.sink.hdfs.AvroFormatRadar
 errors.tolerance=all
 errors.deadletterqueue.topic.name=dead_letter_queue_hdfs
 errors.deadletterqueue.topic.replication.factor=2
