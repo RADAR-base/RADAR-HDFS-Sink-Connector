@@ -138,14 +138,15 @@ public class IntegrationTest {
         try {
             return Stream.of(fs.listStatus(filePath))
                     .flatMap(fileStat -> {
+                        Path subPath = fileStat.getPath();
                         if (fileStat.isDirectory()) {
-                            if (fileStat.getPath().getName().equals("+tmp")) {
+                            if (subPath.getName().equals("+tmp")) {
                                 return Stream.empty();
                             } else {
-                                return getAllFilePath(fileStat.getPath(), fs);
+                                return getAllFilePath(subPath, fs);
                             }
                         } else {
-                            return Stream.of(fileStat.getPath().toString());
+                            return Stream.of(subPath.toString());
                         }
                     });
         } catch (IOException ex) {
