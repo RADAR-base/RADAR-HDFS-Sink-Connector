@@ -1,5 +1,6 @@
 package org.radarbase.sink.hdfs;
 
+import okhttp3.Response;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaValidationException;
 import org.apache.hadoop.conf.Configuration;
@@ -30,13 +31,15 @@ import static org.junit.Assert.assertTrue;
 public class IntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
 
-    @Test(timeout = 120_000L)
+    @Test(timeout = 240_000L)
     public void integrationTest()
             throws IOException, InterruptedException, SchemaValidationException {
+        RestClient restClient = RestClient.global()
+                .server(new ServerConfig("http://localhost:8082"))
+                .build();
+
         RestSender sender = new Builder()
-                .httpClient(RestClient.global()
-                        .server(new ServerConfig("http://localhost:8082"))
-                        .build())
+                .httpClient(restClient)
                 .schemaRetriever(new SchemaRetriever(
                         new ServerConfig("http://localhost:8081"), 5))
                 .build();
@@ -63,6 +66,28 @@ public class IntegrationTest {
                 ObservationKey.getClassSchema(), PhoneSmsUnread.getClassSchema(),
                 ObservationKey.class, PhoneSmsUnread.class);
 
+        long timeout = 1_000;
+
+        for (int i = 0; i < 10; i++) {
+            try (Response response = restClient.request("topics")) {
+                String responseBody = RestClient.responseBody(response);
+                if (response.code() == 200) {
+                    if (responseBody == null || responseBody.length() <= 2) {
+                        logger.warn("Kafka not ready (no topics available yet)");
+                    } else {
+                        logger.info("Kafka ready");
+                        break;
+                    }
+                } else {
+                    logger.warn("Kafka not ready (HTTP code {}): {}", response.code(), responseBody);
+                }
+            } catch (IOException ex) {
+                logger.error("Kafka not ready (failed to connect): {}", ex.toString());
+            }
+            Thread.sleep(timeout);
+            timeout *= Math.min(16_000L, timeout * 2);
+        }
+
         try (KafkaTopicSender<ObservationKey, PhoneLight> topicSender = sender.sender(test1)) {
             topicSender.send(new ObservationKey("a", "b", "c"), new PhoneLight(1d, 1d, 1f));
         }
@@ -77,10 +102,14 @@ public class IntegrationTest {
         Path path = new Path("hdfs://localhost/topicAndroidNew");
 
         Configuration conf = new Configuration();
+
+        FileSystem fs = path.getFileSystem(conf);
+        fs.mkdirs(path);
+
         do {
             Thread.sleep(1000);
 
-            List<String> filePaths = getAllFilePath(path, path.getFileSystem(conf))
+            List<String> filePaths = getAllFilePath(path, fs)
                     .stream()
                     .filter(s -> !s.contains("+tmp"))
                     .collect(Collectors.toList());
