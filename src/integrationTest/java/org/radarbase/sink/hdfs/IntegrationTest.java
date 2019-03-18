@@ -103,20 +103,26 @@ public class IntegrationTest {
 
         Configuration conf = new Configuration();
 
-        FileSystem fs = path.getFileSystem(conf);
-        fs.mkdirs(path);
-
+        FileSystem fs = null;
         do {
             Thread.sleep(1000);
 
-            List<String> filePaths = getAllFilePath(path, fs)
-                    .stream()
-                    .filter(s -> !s.contains("+tmp"))
-                    .collect(Collectors.toList());
-            logger.info("Paths:\n\t{}", String.join("\n\t", filePaths));
-            if (filePaths.size() >= 3) {
-                filePaths.forEach(p -> assertTrue(p.endsWith(".avro")));
-                break;
+            try {
+                if (fs == null) {
+                    fs = path.getFileSystem(conf);
+                }
+
+                List<String> filePaths = getAllFilePath(path, fs)
+                        .stream()
+                        .filter(s -> !s.contains("+tmp"))
+                        .collect(Collectors.toList());
+                logger.info("Paths:\n\t{}", String.join("\n\t", filePaths));
+                if (filePaths.size() >= 3) {
+                    filePaths.forEach(p -> assertTrue(p.endsWith(".avro")));
+                    break;
+                }
+            } catch (Exception ex) {
+                logger.error("Failed to get HDFS listing", ex);
             }
         } while (true);
     }

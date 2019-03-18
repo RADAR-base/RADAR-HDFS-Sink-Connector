@@ -30,8 +30,8 @@ before_install:
 
 script:
   - ./gradlew check --stacktrace
-  - sudo $DC -f $DC_FILE up -d && sleep 60 && ./gradlew integrationTest --stacktrace
-  - sudo $DC -f $DC_FILE down
+  - sudo $DC -f $DC_FILE up -d rest-proxy-1 hdfs-datanode-1 hdfs-datanode-2 && sudo $DC -f $DC_FILE up -d && ./gradlew integrationTest --stacktrace
+  - sudo $DC -f $DC_FILE down -v
 after_script:
   - ./gradlew sendCoverageToCodacy
 

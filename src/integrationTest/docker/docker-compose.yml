@@ -104,7 +104,6 @@ services:
       - hdfs-namenode
     environment:
       CORE_CONF_fs_defaultFS: hdfs://hdfs-namenode:8020
-      HDFS_CONF_dfs_replication: 2
 
   hdfs-datanode-2:
     image: uhopper/hadoop-datanode:2.7.2
@@ -113,16 +112,6 @@ services:
       - hdfs-namenode
     environment:
       CORE_CONF_fs_defaultFS: hdfs://hdfs-namenode:8020
-      HDFS_CONF_dfs_replication: 2
-
-  hdfs-datanode-3:
-    image: uhopper/hadoop-datanode:2.7.2
-    restart: always
-    depends_on:
-      - hdfs-namenode
-    environment:
-      CORE_CONF_fs_defaultFS: hdfs://hdfs-namenode:8020
-      HDFS_CONF_dfs_replication: 2
 
   hdfs-namenode:
     image: uhopper/hadoop-namenode:2.7.2
@@ -131,6 +120,7 @@ services:
       - "8020:8020"
     environment:
       CLUSTER_NAME: radar-base
+      HDFS_CONF_dfs_replication: 2
       HDFS_CONF_dfs_namenode_name_dir: file:///hadoop/dfs/name
 
   #---------------------------------------------------------------------------#
