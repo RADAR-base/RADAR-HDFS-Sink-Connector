@@ -1,34 +1,27 @@
 package org.radarbase.sink.hdfs;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.stream.Stream;
 import okhttp3.Response;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaValidationException;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 import org.radarbase.config.ServerConfig;
-import org.radarcns.kafka.ObservationKey;
-import org.radarcns.passive.phone.PhoneLight;
-import org.radarcns.passive.phone.PhoneSmsUnread;
 import org.radarbase.producer.KafkaTopicSender;
 import org.radarbase.producer.rest.RestClient;
 import org.radarbase.producer.rest.RestSender;
 import org.radarbase.producer.rest.RestSender.Builder;
 import org.radarbase.producer.rest.SchemaRetriever;
 import org.radarbase.topic.AvroTopic;
+import org.radarcns.kafka.ObservationKey;
+import org.radarcns.passive.phone.PhoneLight;
+import org.radarcns.passive.phone.PhoneSmsUnread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertTrue;
 
 public class IntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTest.class);
@@ -79,7 +72,8 @@ public class IntegrationTest {
                         break;
                     }
                 } else {
-                    logger.warn("Kafka not ready (HTTP code {}): {}", response.code(), responseBody);
+                    logger.warn("Kafka not ready (HTTP code {}): {}",
+                            response.code(), responseBody);
                 }
             } catch (IOException ex) {
                 logger.error("Kafka not ready (failed to connect): {}", ex.toString());
