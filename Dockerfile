@@ -30,7 +30,7 @@ COPY ./src/ /code/src
 
 RUN ./gradlew jar
 
-FROM confluentinc/cp-kafka-connect-base:5.0.0
+FROM confluentinc/cp-kafka-connect-base:5.3.0
 
 MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 
