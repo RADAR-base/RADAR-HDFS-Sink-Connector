@@ -67,6 +67,7 @@ public class AvroFormatRadar implements Format<HdfsSinkConnectorConfig, Path> {
         return new AvroFileReader(this.avroData);
     }
 
+    @Deprecated
     public HiveFactory getHiveFactory() {
         return new AvroHiveFactory(this.avroData);
     }

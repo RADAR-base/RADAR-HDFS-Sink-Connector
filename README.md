@@ -41,7 +41,7 @@ Contains HDFS-Sink-Connector of RADAR-base platform
 ## Docker usage
 
 To run this connector as a docker container, use the [radarbase/radar-hdfs-connector](https://hub.docker.org/radarbase/radar-hdfs-connector) docker image. See the README in the `docker` directory for more information.
-It runs the [Confluent HDFS Connector 5.1.2]([here](https://docs.confluent.io/current/connect/kafka-connect-hdfs/index.html) using a custom record write provider to store both keys and values.
+It runs the [Confluent HDFS Connector 5.3.1]([here](https://docs.confluent.io/current/connect/kafka-connect-hdfs/index.html) using a custom record write provider to store both keys and values.
 
 Create the docker image:
 ```

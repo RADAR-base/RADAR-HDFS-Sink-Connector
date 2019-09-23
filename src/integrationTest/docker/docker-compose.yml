@@ -6,7 +6,7 @@ services:
   # Zookeeper Cluster                                                         #
   #---------------------------------------------------------------------------#
   zookeeper-1:
-    image: confluentinc/cp-zookeeper:5.1.2
+    image: confluentinc/cp-zookeeper:${CONFLUENT_VERSION}
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -19,7 +19,7 @@ services:
   # Kafka Cluster                                                             #
   #---------------------------------------------------------------------------#
   kafka-1:
-    image: confluentinc/cp-kafka:5.1.2
+    image: confluentinc/cp-kafka:${CONFLUENT_VERSION}
     depends_on:
       - zookeeper-1
     environment:
@@ -31,7 +31,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
 
   kafka-2:
-    image: confluentinc/cp-kafka:5.1.2
+    image: confluentinc/cp-kafka:${CONFLUENT_VERSION}
     depends_on:
       - zookeeper-1
     environment:
@@ -58,7 +58,7 @@ services:
   # Schema Registry                                                           #
   #---------------------------------------------------------------------------#
   schema-registry-1:
-    image: confluentinc/cp-schema-registry:5.1.2
+    image: confluentinc/cp-schema-registry:${CONFLUENT_VERSION}
     depends_on:
       - zookeeper-1
       - kafka-1
@@ -78,7 +78,7 @@ services:
   # REST proxy                                                                #
   #---------------------------------------------------------------------------#
   rest-proxy-1:
-    image: confluentinc/cp-kafka-rest:5.1.2
+    image: confluentinc/cp-kafka-rest:${CONFLUENT_VERSION}
     depends_on:
       - kafka-1
       - kafka-2
@@ -129,6 +129,8 @@ services:
   radar-hdfs-connector:
     build:
       context: ../../..
+      args:
+        CONFLUENT_VERSION: ${CONFLUENT_VERSION}
     restart: on-failure
     volumes:
       - ./sink-hdfs.properties:/etc/kafka-connect/sink-hdfs.properties

@@ -15,7 +15,7 @@ FROM openjdk:8-alpine as builder
 RUN mkdir /code
 WORKDIR /code
 
-ENV GRADLE_OPTS -Dorg.gradle.daemon=false -Dorg.gradle.project.profile=docker
+ENV GRADLE_OPTS -Dorg.gradle.project.profile=docker
 
 COPY ./gradle/wrapper /code/gradle/wrapper
 COPY ./gradlew /code/
@@ -30,7 +30,9 @@ COPY ./src/ /code/src
 
 RUN ./gradlew jar
 
-FROM confluentinc/cp-kafka-connect-base:5.1.2
+ARG CONFLUENT_VERSION=5.3.1
+
+FROM confluentinc/cp-kafka-connect-base:${CONFLUENT_VERSION}
 
 MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 

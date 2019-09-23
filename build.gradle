@@ -12,9 +12,9 @@ targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
 
 ext {
-    confluentVersion = '5.1.2'
-    kafkaVersion = '2.1.1'
-    radarCommonsVersion = '0.12.0'
+    confluentVersion = '5.3.1'
+    kafkaVersion = '2.3.0'
+    radarCommonsVersion = '0.12.2'
 }
 
 configurations {
@@ -24,6 +24,7 @@ configurations {
 repositories {
     jcenter()
     maven { url 'http://repo.spring.io/plugins-release/' }
+    maven { url 'https://repo.thehyve.nl/content/repositories/releases/'}
     maven { url 'http://packages.confluent.io/maven/' }
     maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
     maven { url "https://dl.bintray.com/radar-base/org.radarbase" }
@@ -40,6 +41,10 @@ dependencies {
     compileOnly group: 'org.apache.kafka', name: 'kafka_2.12', version: kafkaVersion
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
 jar {
     manifest {
         attributes 'Implementation-Title': 'RADAR-base HDFS Connector',
@@ -48,7 +53,7 @@ jar {
 }
 
 wrapper {
-    gradleVersion '5.2.1'
+    gradleVersion '5.6.2'
 }
 
 if (!hasProperty('profile')) {
