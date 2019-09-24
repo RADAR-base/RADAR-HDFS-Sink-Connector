@@ -29,9 +29,9 @@ before_install:
   - chmod +x $DC;
 
 script:
-  - ./gradlew check
-  - sudo $DC -f $DC_FILE up -d && sleep 30 && ./gradlew integrationTest
-  - sudo $DC -f $DC_FILE down
+  - ./gradlew check --stacktrace
+  - sudo $DC -f $DC_FILE up -d rest-proxy-1 hdfs-datanode-1 hdfs-datanode-2 && sleep 15 && sudo $DC -f $DC_FILE up -d && ./gradlew integrationTest --stacktrace
+  - sudo $DC -f $DC_FILE down -v
 after_script:
   - ./gradlew sendCoverageToCodacy
 

@@ -19,7 +19,13 @@ Contains HDFS-Sink-Connector of RADAR-base platform
     topics=mock_empatica_e4_battery_level,mock_empatica_e4_blood_volume_pulse
     flush.size=1200
     hdfs.url=hdfs://localhost:9000
-    format.class=org.radarcns.sink.hdfs.AvroFormatRadar
+    format.class=org.radarbase.sink.hdfs.AvroFormatRadar
+    errors.tolerance=all
+    errors.deadletterqueue.topic.name=dead_letter_queue_hdfs
+    errors.deadletterqueue.topic.replication.factor=2
+    errors.deadletterqueue.context.headers.enable=true
+    errors.retry.delay.max.ms=60000
+    errors.retry.timeout=300000
     ```
    
 4. Run the connector. To run the connector in `standalone mode` (on an enviornment confluent platform is installed)
@@ -31,7 +37,7 @@ Contains HDFS-Sink-Connector of RADAR-base platform
 ## Docker usage
 
 To run this connector as a docker container, use the [radarbase/radar-hdfs-connector](https://hub.docker.org/radarbase/radar-hdfs-connector) docker image. See the README in the `docker` directory for more information.
-It runs the Confluent HDFS Connector 4.1.0 using a custom [RecordWriterProvider](https://github.com/RADAR-CNS/RADAR-Backend/blob/dev/src/main/java/org/radarcns/sink/hdfs/AvroRecordWriterProviderRadar.java) to support RADAR-CNS Avro schemas. For more details about Confluent HDFS Connector click [here](http://docs.confluent.io/4.1.0/connect/connect-hdfs/docs/index.html).
+It runs the []Confluent HDFS Connector 5.1.2]([here](https://docs.confluent.io/current/connect/kafka-connect-hdfs/index.html) using a custom record write provider to store both keys and values.
 
 Create the docker image:
 ```
@@ -40,7 +46,7 @@ $ docker build -t radarbase/radar-hdfs-connector ./
 
 Or pull from dockerhub:
 ```
-$ docker pull radarbase/radar-hdfs-connector:0.1.2
+$ docker pull radarbase/radar-hdfs-connector:1.0.0
 ```
 
 ### Configuration
@@ -54,8 +60,14 @@ tasks.max=4
 topics=topic1, topic2, ...
 flush.size=15000
 hdfs.url=hdfs://namenode:8020
-format.class=org.radarcns.sink.hdfs.AvroFormatRadar
+format.class=org.radarbase.sink.hdfs.AvroFormatRadar
 topics.dir=topicAndroidNew
+errors.tolerance=all
+errors.deadletterqueue.topic.name=dead_letter_queue_hdfs
+errors.deadletterqueue.topic.replication.factor=2
+errors.deadletterqueue.context.headers.enable=true
+errors.retry.delay.max.ms=60000
+errors.retry.timeout=300000
 ```
 
 The docker-compose service could be defined as follows:
@@ -63,7 +75,7 @@ The docker-compose service could be defined as follows:
 ```yaml
 services:
   radar-hdfs-connector:
-    image: radarbase/radar-hdfs-connector:0.1.2
+    image: radarbase/radar-hdfs-connector:1.0.0
     restart: on-failure
     volumes:
       - ./sink-hdfs.properties:/etc/kafka-connect/sink-hdfs.properties
@@ -100,7 +112,7 @@ services:
       retries: 3
 ```
 
-For a complete use case scenario, check the [RADAR-CNS `docker-compose` file](https://github.com/RADAR-CNS/RADAR-Docker/blob/backend-integration/dcompose-stack/radar-cp-hadoop-stack/docker-compose.yml).
+For a complete use case scenario, check the [RADAR-base `docker-compose` file](https://github.com/RADAR-base/RADAR-Docker/tree/master/dcompose-stack/radar-cp-hadoop-stack/docker-compose.yml).
 
 ## Contributing
 
