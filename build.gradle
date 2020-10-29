@@ -1,19 +1,22 @@
 plugins {
     // Apply the java plugin to add support for Java
     id 'java-library'
-    id 'com.jfrog.bintray' version '1.8.1' apply false
+    id 'com.jfrog.bintray' version '1.8.5' apply false
 }
 
-group = 'org.radarcns'
-version '0.2.1'
+group = 'org.radarbase'
+version = '1.0.0'
+description = 'An HDFS Sink connector for the RADAR-base platform.'
 
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
+java {
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
 ext {
-    confluentVersion = '5.0.0'
-    kafkaVersion = '2.0.0-cp1'
-    radarCommonsVersion = '0.10.0'
+    confluentVersion = '5.3.1'
+    kafkaVersion = '2.3.0'
+    radarCommonsVersion = '0.12.2'
 }
 
 configurations {
@@ -22,31 +25,37 @@ configurations {
 
 repositories {
     jcenter()
-    maven { url 'http://repo.spring.io/plugins-release/' }
-    maven { url 'http://packages.confluent.io/maven/' }
+    maven { url 'https://repo.spring.io/plugins-release/' }
+    maven { url 'https://repo.thehyve.nl/content/repositories/releases/'}
+    maven { url 'https://packages.confluent.io/maven/' }
+    maven { url 'https://dl.bintray.com/typesafe/maven-releases' }
+    maven { url "https://dl.bintray.com/radar-base/org.radarbase" }
     maven { url 'https://jitpack.io' }
-    maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
 }
 
 dependencies {
     api group: 'io.confluent', name: 'kafka-connect-hdfs', version: confluentVersion
 
-    runtimeOnly group: 'org.radarcns', name: 'radar-commons-unsafe', version: radarCommonsVersion
+    runtimeOnly group: 'org.radarbase', name: 'radar-commons-unsafe', version: radarCommonsVersion
 
     compileOnly group: 'org.apache.kafka', name: 'connect-api', version: kafkaVersion
 
     compileOnly group: 'org.apache.kafka', name: 'kafka_2.12', version: kafkaVersion
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
 jar {
     manifest {
-        attributes 'Implementation-Title': 'RADAR-CNS HDFS Connector',
-                'Implementation-Version': version
+        attributes 'Implementation-Title': 'RADAR-base HDFS Connector',
+                'Implementation-Version': project.version
     }
 }
 
 wrapper {
-    gradleVersion '4.9'
+    gradleVersion '6.6.1'
 }
 
 if (!hasProperty('profile')) {

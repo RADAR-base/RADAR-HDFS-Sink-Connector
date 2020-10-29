@@ -10,7 +10,7 @@ repositories {
     maven { url "http://dl.bintray.com/typesafe/maven-releases" }
 }
 dependencies {
-    codacy 'com.github.codacy:codacy-coverage-reporter:4.0.1'
+    codacy 'com.github.codacy:codacy-coverage-reporter:6.0.0'
 }
 
 //---------------------------------------------------------------------------//
@@ -63,5 +63,5 @@ jacocoTestReport {
 task sendCoverageToCodacy(type: JavaExec, dependsOn: jacocoTestReport) {
     main = 'com.codacy.CodacyCoverageReporter'
     classpath = configurations.codacy
-    args = ['-l', 'Java', '-r', "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"]
+    args = ['report', '-l', 'Java', '-r', "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"]
 }

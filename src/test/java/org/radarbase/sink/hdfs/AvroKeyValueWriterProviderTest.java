@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package org.radarcns.sink.hdfs;
+package org.radarbase.sink.hdfs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import io.confluent.connect.avro.AvroData;
 import io.confluent.connect.hdfs.HdfsSinkConnectorConfig;
+import io.confluent.connect.storage.format.RecordWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.confluent.connect.storage.format.RecordWriter;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.sink.SinkRecord;

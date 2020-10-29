@@ -6,12 +6,12 @@ ext.githubUrl = 'https://github.com/RADAR-base/RADAR-HDFS-Sink-Connector'
 
 // custom tasks for creating source/javadoc jars
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from sourceSets.main.output
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
@@ -24,18 +24,12 @@ publishing {
     publications {
         RadarPublication(MavenPublication) {
             from components.java
-
-            artifact sourcesJar {
-                classifier 'sources'
-            }
-
-            artifact javadocJar {
-                classifier 'javadoc'
-            }
+            artifact sourcesJar
+            artifact javadocJar
 
             pom {
                 name = project.name
-                description = 'A HDFS Sink connector for RADAR-CNS platform.'
+                description = project.description
                 url = githubUrl
                 licenses {
                     license {
@@ -46,7 +40,12 @@ publishing {
                 }
                 developers {
                     developer {
-                        id = 'radar-cns'
+                        id = 'blootsvoets'
+                        name = 'Joris Borgdorff'
+                        email = 'joris@thehyve.nl'
+                    }
+                    developer {
+                        id = 'nivemaham'
                         name = 'Nivethika'
                         email = 'nivethika@thehyve.nl'
                     }
@@ -78,7 +77,7 @@ bintray {
     pkg {
         repo = project.group
         name = project.name
-        userOrg = 'radar-cns'
+        userOrg = 'radar-base'
         licenses = ['Apache-2.0']
         vcsUrl = githubUrl
         version {
