@@ -8,8 +8,10 @@ group = 'org.radarbase'
 version = '1.0.0'
 description = 'An HDFS Sink connector for the RADAR-base platform.'
 
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
+java {
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
 ext {
     confluentVersion = '5.3.1'

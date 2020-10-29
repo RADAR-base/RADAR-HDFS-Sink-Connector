@@ -1,16 +1,15 @@
-
 language: java
 jdk:
-  - oraclejdk8
-sudo: required
+  - oraclejdk11
 
 services:
   - docker
 
 env:
-  DOCKER_COMPOSE_VERSION: 1.21.2
-  DC: ~/bin/docker-compose
-  DC_FILE: src/integrationTest/docker/docker-compose.yml
+  global:
+    - DOCKER_COMPOSE_VERSION=1.27.4
+    - DC=~/bin/docker-compose
+    - DC_FILE=src/integrationTest/docker/docker-compose.yml
 
 cache:
   directories:
