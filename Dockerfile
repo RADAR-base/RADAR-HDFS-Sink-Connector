@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ARG CONFLUENT_VERSION=5.3.1
+
 FROM openjdk:8-alpine as builder
 
 RUN mkdir /code
@@ -30,9 +32,7 @@ COPY ./src/ /code/src
 
 RUN ./gradlew jar
 
-ARG CONFLUENT_VERSION=5.3.1
-
-FROM confluentinc/cp-kafka-connect-base:${CONFLUENT_VERSION}
+FROM confluentinc/cp-kafka-connect-base:$CONFLUENT_VERSION
 
 MAINTAINER Nivethika M <nivethika@thehyve.nl> , Joris B <joris@thehyve.nl> , Yatharth R <yatharth.ranjan@kcl.ac.uk>
 

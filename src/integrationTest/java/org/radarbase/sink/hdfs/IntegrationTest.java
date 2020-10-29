@@ -116,7 +116,7 @@ public class IntegrationTest {
                     }
                 }
             } catch (Exception ex) {
-                logger.error("Failed to get HDFS listing", ex);
+                logger.error("Failed to get HDFS listing, trying again later: {}", ex.toString());
             }
         } while (true);
     }

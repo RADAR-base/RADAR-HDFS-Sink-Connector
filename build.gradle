@@ -1,7 +1,7 @@
 plugins {
     // Apply the java plugin to add support for Java
     id 'java-library'
-    id 'com.jfrog.bintray' version '1.8.4' apply false
+    id 'com.jfrog.bintray' version '1.8.5' apply false
 }
 
 group = 'org.radarbase'
@@ -23,10 +23,10 @@ configurations {
 
 repositories {
     jcenter()
-    maven { url 'http://repo.spring.io/plugins-release/' }
+    maven { url 'https://repo.spring.io/plugins-release/' }
     maven { url 'https://repo.thehyve.nl/content/repositories/releases/'}
-    maven { url 'http://packages.confluent.io/maven/' }
-    maven { url 'http://dl.bintray.com/typesafe/maven-releases' }
+    maven { url 'https://packages.confluent.io/maven/' }
+    maven { url 'https://dl.bintray.com/typesafe/maven-releases' }
     maven { url "https://dl.bintray.com/radar-base/org.radarbase" }
     maven { url 'https://jitpack.io' }
 }
@@ -53,7 +53,7 @@ jar {
 }
 
 wrapper {
-    gradleVersion '5.6.2'
+    gradleVersion '6.6.1'
 }
 
 if (!hasProperty('profile')) {
